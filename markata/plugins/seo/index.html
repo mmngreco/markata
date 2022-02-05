@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <title>
+   seo.py
+  </title>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <style>
+   /* 
+      #c678dd -> #c678dd
+      #c678dd ->
+      #a6e22e -> #61afef
+      */
+      html  { background: #1f2022; color: #eefbfe }
+      a { color: #47cbff; }
+      body { max-width: 800px; margin: auto; font-size: 1rem; line-height: 1.56;}
+      blockquote {
+        border-left: 5px solid #e1bd00c9;
+        padding-left: 1rem;
+        margin: 1rem;
+        }
+      li.post {
+        list-style-type: None;
+        padding: .2rem 0;
+      }
+      pre {padding: 1rem}
+      code {color: #e672e6; 
+        background-color: rgba(255,255,255, .05);
+        background-color: #1b1c1e;
+      }
+      pre {
+        padding: 1rem;
+        max-width: fit-content;
+        overflow-x: auto;
+      }
+        padding: .15rem .3rem;
+      }
+
+      .highlight .hll { background-color: #49483e }
+      .highlight  { background: #272822; color: #abb2bf;
+        background-color: #1b1c1e;
+
+      }
+      .highlight .c { color: #8b8b8b } /* Comment */
+      .highlight .err { color: #960050; background-color: #1e0010 } /* Error */
+      .highlight .k { color: #c678dd } /* Keyword */
+      .highlight .l { color: #ae81ff } /* Literal */
+      .highlight .n { color: #abb2bf } /* Name */
+      .highlight .o { color: #c678dd } /* Operator */
+      .highlight .p { color: #abb2bf } /* Punctuation */
+      .highlight .ch { color: #8b8b8b } /* Comment.Hashbang */
+      .highlight .cm { color: #8b8b8b } /* Comment.Multiline */
+      .highlight .cp { color: #8b8b8b } /* Comment.Preproc */
+      .highlight .cpf { color: #8b8b8b } /* Comment.PreprocFile */
+      .highlight .c1 { color: #8b8b8b } /* Comment.Single */
+      .highlight .cs { color: #8b8b8b } /* Comment.Special */
+      .highlight .gd { color: #c678dd } /* Generic.Deleted */
+      .highlight .ge { font-style: italic } /* Generic.Emph */
+      .highlight .gi { color: #a6e22e } /* Generic.Inserted */
+      .highlight .gs { font-weight: bold } /* Generic.Strong */
+      .highlight .gu { color: #8b8b8b } /* Generic.Subheading */
+      .highlight .kc { color: #c678dd } /* Keyword.Constant */
+      .highlight .kd { color: #c678dd } /* Keyword.Declaration */
+      .highlight .kn { color: #c678dd } /* Keyword.Namespace */
+      .highlight .kp { color: #c678dd } /* Keyword.Pseudo */
+      .highlight .kr { color: #c678dd } /* Keyword.Reserved */
+      .highlight .kt { color: #c678dd } /* Keyword.Type */
+      .highlight .ld { color: #e6db74 } /* Literal.Date */
+      .highlight .m { color: #ae81ff } /* Literal.Number */
+      .highlight .s { color: #e6db74 } /* Literal.String */
+      .highlight .na { color: #a6e22e } /* Name.Attribute */
+      .highlight .nb { color: #98c379 } /* Name.Builtin */
+      .highlight .nc { color: #abb2bf } /* Name.Class */
+      .highlight .no { color: #c678dd } /* Name.Constant */
+      .highlight .nd { color: #abb2bf } /* Name.Decorator */
+      .highlight .ni { color: #abb2bf } /* Name.Entity */
+      .highlight .ne { color: #a6e22e } /* Name.Exception */
+      .highlight .nf { color: #61afef } /* Name.Function */
+      .highlight .nl { color: #abb2bf } /* Name.Label */
+      .highlight .nn { color: #abb2bf } /* Name.Namespace */
+      .highlight .nx { color: #a6e22e } /* Name.Other */
+      .highlight .py { color: #abb2bf } /* Name.Property */
+      .highlight .nt { color: #c678dd } /* Name.Tag */
+      .highlight .nv { color: #abb2bf } /* Name.Variable */
+      .highlight .ow { color: #c678dd } /* Operator.Word */
+      .highlight .w { color: #abb2bf } /* Text.Whitespace */
+      .highlight .mb { color: #ae81ff } /* Literal.Number.Bin */
+      .highlight .mf { color: #ae81ff } /* Literal.Number.Float */
+      .highlight .mh { color: #ae81ff } /* Literal.Number.Hex */
+      .highlight .mi { color: #ae81ff } /* Literal.Number.Integer */
+      .highlight .mo { color: #ae81ff } /* Literal.Number.Oct */
+      .highlight .sa { color: #e6db74 } /* Literal.String.Affix */
+      .highlight .sb { color: #e6db74 } /* Literal.String.Backtick */
+      .highlight .sc { color: #e6db74 } /* Literal.String.Char */
+      .highlight .dl { color: #e6db74 } /* Literal.String.Delimiter */
+      .highlight .sd { color: #98c379 } /* Literal.String.Doc */
+      .highlight .s2 { color: #98c379 } /* Literal.String.Double */
+      .highlight .se { color: #ae81ff } /* Literal.String.Escape */
+      .highlight .sh { color: #e6db74 } /* Literal.String.Heredoc */
+      .highlight .si { color: #e6db74 } /* Literal.String.Interpol */
+      .highlight .sx { color: #e6db74 } /* Literal.String.Other */
+      .highlight .sr { color: #e6db74 } /* Literal.String.Regex */
+      .highlight .s1 { color: #e6db74 } /* Literal.String.Single */
+      .highlight .ss { color: #e6db74 } /* Literal.String.Symbol */
+      .highlight .bp { color: #abb2bf } /* Name.Builtin.Pseudo */
+      .highlight .fm { color: #61afef } /* Name.Function.Magic */
+      .highlight .vc { color: #abb2bf } /* Name.Variable.Class */
+      .highlight .vg { color: #abb2bf } /* Name.Variable.Global */
+      .highlight .vi { color: #abb2bf } /* Name.Variable.Instance */
+      .highlight .vm { color: #abb2bf } /* Name.Variable.Magic */
+      .highlight .il { color: #ae81ff } /* Literal.Number.Integer.Long */
+
+/* Tab style starts here */
+.tabbed-set {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  margin: 1em 0;
+  border-radius: 0.1rem;
+}
+
+.tabbed-set > input {
+  display: none;
+}
+
+.tabbed-set label {
+  width: auto;
+  padding: 0.9375em 1.25em 0.78125em;
+  font-weight: 700;
+  font-size: 0.84em;
+  white-space: nowrap;
+  border-bottom: 0.15rem solid transparent;
+  border-top-left-radius: 0.1rem;
+  border-top-right-radius: 0.1rem;
+  cursor: pointer;
+  transition: background-color 250ms, color 250ms;
+}
+
+.tabbed-set .tabbed-content {
+  width: 100%;
+  display: none;
+  box-shadow: 0 -.05rem #ddd;
+}
+
+.tabbed-set input {
+  position: absolute;
+  opacity: 0;
+}
+
+/* fonts */
+h1 {
+    font-weight: 700;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: "Space Mono", monospace;
+}
+
+h1 {
+    font-size: 2.5em;
+}
+
+h2 {
+    font-size: 1.63rem;
+}
+
+
+p {
+    font-family: "Space Mono", monospace;
+    font-size: 21px;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+@media only screen and (max-width: 700px) {
+    p {
+        font-size: 18px;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    p {
+        font-size: 16px;
+    }
+}
+
+@media only screen and (max-width: 500px) {
+    p {
+        font-size: 14px;
+    }
+}
+
+@media only screen and (max-width: 400px) {
+    p {
+        font-size: 12px;
+    }
+}
+
+blockquote {
+    font-family: "Space Mono", monospace;
+}
+
+code {
+    font-family: "Space Mono", monospace;
+}
+
+pre {
+    font-family: "Segoe UI", Frutiger, "Frutiger Linotype", "Dejavu Sans", "Helvetica Neue", Arial, sans-serif;
+    font-family: "Space Mono", monospace;
+    font-family: "Space Mono", monospace;
+    /* font-size: 13px;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: 400;
+    line-height: 18.5714px; */
+}
+
+a {
+
+    font-family: "Space Mono", monospace;
+    font-weight: 600;
+    text-decoration-color: goldenrod;
+    color: #6ab1cd;
+    padding: .3rem .5rem;
+    display: inline-block;
+}
+
+.admonition {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    text-align: left;
+}
+
+.admonition.note {
+    color: #79d3e6;
+    background-color: #123c52;
+    border-color: #1c7183;
+}
+
+.admonition.warning {
+    color: #e6ca7a;
+    background-color: #4f4409;
+    border-color: #855c0d;
+}
+
+.admonition.danger {
+    color: #e67471;
+    background-color: #461c1c;
+    border-color: #6e2b33;
+}
+
+.admonition-title {
+    font-weight: bold;
+    text-align: left;
+}
+
+table {
+    margin: 1rem 0;
+    border-collapse: collapse;
+    border-spacing: 0;
+    display: block;
+    max-width: -moz-fit-content;
+    max-width: fit-content;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+table thead th {
+    border: solid 1px #ffffff42;
+    padding: 10px;
+    text-align: left;
+}
+
+table tbody td {
+    border: solid 1px #ffffff42;
+    padding: 10px;
+}
+  </style>
+  <meta content="Waylon Walker" name="og:author" property="og:author"/>
+  <meta content="waylon@waylonwalaker.com" name="og:author_email" property="og:author_email"/>
+  <meta content="website" name="og:type" property="og:type"/>
+  <meta content="Docs for seo" name="description" property="description"/>
+  <meta content="Docs for seo" name="og:description" property="og:description"/>
+  <meta content="Docs for seo" name="twitter:description" property="twitter:description"/>
+  <meta content="seo.py | Markata" name="og:title" property="og:title"/>
+  <meta content="seo.py | Markata" name="twitter:title" property="twitter:title"/>
+  <meta content="https://markata.dev/markata/plugins/seo-og.png" name="og:image" property="og:image"/>
+  <meta content="https://markata.dev/markata/plugins/seo-og.png" name="twitter:image" property="twitter:image"/>
+  <meta content="1600" name="og:image:width" property="og:image:width"/>
+  <meta content="900" name="og:image:width" property="og:image:width"/>
+  <meta content="summary_large_image" name="twitter:card" property="twitter:card"/>
+  <meta content="Markata" name="og:site_name" property="og:site_name"/>
+  <meta content="@_waylonwalker" name="twitter:creator" property="twitter:creator"/>
+  <meta content="seo.py" name="title" property="title"/>
+  <meta content="markata 0.1.0" name="generator" property="generator"/>
+  <link href="https://markata.dev/markata/plugins/seo/" rel="canonical"/>
+  <meta content="https://markata.dev/markata/plugins/seo/" name="og:url" property="og:url"/>
+ </head>
+ <body>
+  <h1>
+   seo.py
+   <a class="heading-permalink" href="#None">
+    <span class="visually-hidden">
+    </span>
+    <svg aria-hidden="true" fill="currentColor" focusable="false" height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg">
+     <path d="M9.199 13.599a5.99 5.99 0 0 0 3.949 2.345 5.987 5.987 0 0 0 5.105-1.702l2.995-2.994a5.992 5.992 0 0 0 1.695-4.285 5.976 5.976 0 0 0-1.831-4.211 5.99 5.99 0 0 0-6.431-1.242 6.003 6.003 0 0 0-1.905 1.24l-1.731 1.721a.999.999 0 1 0 1.41 1.418l1.709-1.699a3.985 3.985 0 0 1 2.761-1.123 3.975 3.975 0 0 1 2.799 1.122 3.997 3.997 0 0 1 .111 5.644l-3.005 3.006a3.982 3.982 0 0 1-3.395 1.126 3.987 3.987 0 0 1-2.632-1.563A1 1 0 0 0 9.201 13.6zm5.602-3.198a5.99 5.99 0 0 0-3.949-2.345 5.987 5.987 0 0 0-5.105 1.702l-2.995 2.994a5.992 5.992 0 0 0-1.695 4.285 5.976 5.976 0 0 0 1.831 4.211 5.99 5.99 0 0 0 6.431 1.242 6.003 6.003 0 0 0 1.905-1.24l1.723-1.723a.999.999 0 1 0-1.414-1.414L9.836 19.81a3.985 3.985 0 0 1-2.761 1.123 3.975 3.975 0 0 1-2.799-1.122 3.997 3.997 0 0 1-.111-5.644l3.005-3.006a3.982 3.982 0 0 1 3.395-1.126 3.987 3.987 0 0 1 2.632 1.563 1 1 0 0 0 1.602-1.198z">
+     </path>
+    </svg>
+   </a>
+  </h1>
+  <p>
+   manifest plugin
+  </p>
+  <hr/>
+  <h2 id="_create_seo-function">
+   _create_seo
+   <code>
+    function
+   </code>
+   <a class="heading-permalink" href="#_create_seo-function">
+    <span class="visually-hidden">
+    </span>
+    <svg aria-hidden="true" fill="currentColor" focusable="false" height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg">
+     <path d="M9.199 13.599a5.99 5.99 0 0 0 3.949 2.345 5.987 5.987 0 0 0 5.105-1.702l2.995-2.994a5.992 5.992 0 0 0 1.695-4.285 5.976 5.976 0 0 0-1.831-4.211 5.99 5.99 0 0 0-6.431-1.242 6.003 6.003 0 0 0-1.905 1.24l-1.731 1.721a.999.999 0 1 0 1.41 1.418l1.709-1.699a3.985 3.985 0 0 1 2.761-1.123 3.975 3.975 0 0 1 2.799 1.122 3.997 3.997 0 0 1 .111 5.644l-3.005 3.006a3.982 3.982 0 0 1-3.395 1.126 3.987 3.987 0 0 1-2.632-1.563A1 1 0 0 0 9.201 13.6zm5.602-3.198a5.99 5.99 0 0 0-3.949-2.345 5.987 5.987 0 0 0-5.105 1.702l-2.995 2.994a5.992 5.992 0 0 0-1.695 4.285 5.976 5.976 0 0 0 1.831 4.211 5.99 5.99 0 0 0 6.431 1.242 6.003 6.003 0 0 0 1.905-1.24l1.723-1.723a.999.999 0 1 0-1.414-1.414L9.836 19.81a3.985 3.985 0 0 1-2.761 1.123 3.975 3.975 0 0 1-2.799-1.122 3.997 3.997 0 0 1-.111-5.644l3.005-3.006a3.982 3.982 0 0 1 3.395-1.126 3.987 3.987 0 0 1 2.632 1.563 1 1 0 0 0 1.602-1.198z">
+     </path>
+    </svg>
+   </a>
+  </h2>
+  <p>
+   None
+  </p>
+  <details>
+   <summary>
+    _create_seo source
+   </summary>
+   <div class="highlight">
+    <pre><span></span><code><span class="k">def</span> <span class="nf">_create_seo</span><span class="p">(</span>
+    <span class="n">markata</span><span class="p">:</span> <span class="n">Markata</span><span class="p">,</span>
+    <span class="n">soup</span><span class="p">:</span> <span class="n">BeautifulSoup</span><span class="p">,</span>
+    <span class="n">article</span><span class="p">:</span> <span class="s2">"frontmatter.Post"</span><span class="p">,</span>
+    <span class="n">site_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">author_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">author_email</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">twitter_card</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">twitter_creator</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">config_seo</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
+    <span class="n">images_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">article</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"description"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">""</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">article</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"description"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">"post-body"</span><span class="p">)</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s2">"p"</span><span class="p">)]</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()[:</span><span class="mi">120</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">article</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"description"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">""</span>
+
+    <span class="n">seo</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="o">*</span><span class="n">config_seo</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"og:author"</span><span class="p">,</span>
+            <span class="s2">"property"</span><span class="p">:</span> <span class="s2">"og:author"</span><span class="p">,</span>
+            <span class="s2">"content"</span><span class="p">:</span> <span class="n">author_name</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"og:author_email"</span><span class="p">,</span>
+            <span class="s2">"property"</span><span class="p">:</span> <span class="s2">"og:author_email"</span><span class="p">,</span>
+            <span class="s2">"content"</span><span class="p">:</span> <span class="n">author_email</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"og:type"</span><span class="p">,</span>
+            <span class="s2">"property"</span><span class="p">:</span> <span class="s2">"og:type"</span><span class="p">,</span>
+            <span class="s2">"content"</span><span class="p">:</span> <span class="s2">"website"</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"description"</span><span class="p">,</span>
+            <span class="s2">"property"</span><span class="p">:</span> <span class="s2">"description"</span><span class="p">,</span>
+            <span class="s2">"content"</span><span class="p">:</span> <span class="n">article</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"description"</span><span class="p">],</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"og:description"</span><span class="p">,</span>
+            <span class="s2">"property"</span><span class="p">:</span> <span class="s2">"og:description"</span><span class="p">,</span>
+            <span class="s2">"content"</span><span class="p">:</span> <span class="n">article</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"description"</span><span class="p">],</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"twitter:description"</span><span class="p">,</span>
+            <span class="s2">"property"</span><span class="p">:</span> <span class="s2">"twitter:description"</span><span class="p">,</span>
+            <span class="s2">"content"</span><span class="p">:</span> <span class="n">article</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"description"</span><span class="p">],</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"og:title"</span><span class="p">,</span>
+            <span class="s2">"property"</span><span class="p">:</span> <span class="s2">"og:title"</span><span class="p">,</span>
+            <span class="s2">"content"</span><span class="p">:</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">article</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"title"</span><span class="p">]</span><span class="si">}</span><span class="s1"> | </span><span class="si">{</span><span class="n">site_name</span><span class="si">}</span><span class="s1">'</span><span class="p">[:</span><span class="mi">60</span><span class="p">],</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"twitter:title"</span><span class="p">,</span>
+            <span class="s2">"property"</span><span class="p">:</span> <span class="s2">"twitter:title"</span><span class="p">,</span>
+            <span class="s2">"content"</span><span class="p">:</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">article</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"title"</span><span class="p">]</span><span class="si">}</span><span class="s1"> | </span><span class="si">{</span><span class="n">site_name</span><span class="si">}</span><span class="s1">'</span><span class="p">[:</span><span class="mi">60</span><span class="p">],</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"og:image"</span><span class="p">,</span>
+            <span class="s2">"property"</span><span class="p">:</span> <span class="s2">"og:image"</span><span class="p">,</span>
+            <span class="s2">"content"</span><span class="p">:</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">images_url</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">article</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"slug"</span><span class="p">]</span><span class="si">}</span><span class="s1">-og.png'</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"twitter:image"</span><span class="p">,</span>
+            <span class="s2">"property"</span><span class="p">:</span> <span class="s2">"twitter:image"</span><span class="p">,</span>
+            <span class="s2">"content"</span><span class="p">:</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">images_url</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">article</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"slug"</span><span class="p">]</span><span class="si">}</span><span class="s1">-og.png'</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"og:image:width"</span><span class="p">,</span>
+            <span class="s2">"property"</span><span class="p">:</span> <span class="s2">"og:image:width"</span><span class="p">,</span>
+            <span class="s2">"content"</span><span class="p">:</span> <span class="s2">"1600"</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"og:image:width"</span><span class="p">,</span>
+            <span class="s2">"property"</span><span class="p">:</span> <span class="s2">"og:image:width"</span><span class="p">,</span>
+            <span class="s2">"content"</span><span class="p">:</span> <span class="s2">"900"</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"twitter:card"</span><span class="p">,</span>
+            <span class="s2">"property"</span><span class="p">:</span> <span class="s2">"twitter:card"</span><span class="p">,</span>
+            <span class="s2">"content"</span><span class="p">:</span> <span class="n">twitter_card</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"og:site_name"</span><span class="p">,</span>
+            <span class="s2">"property"</span><span class="p">:</span> <span class="s2">"og:site_name"</span><span class="p">,</span>
+            <span class="s2">"content"</span><span class="p">:</span> <span class="n">site_name</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"twitter:creator"</span><span class="p">,</span>
+            <span class="s2">"property"</span><span class="p">:</span> <span class="s2">"twitter:creator"</span><span class="p">,</span>
+            <span class="s2">"content"</span><span class="p">:</span> <span class="n">twitter_creator</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"title"</span><span class="p">,</span>
+            <span class="s2">"property"</span><span class="p">:</span> <span class="s2">"title"</span><span class="p">,</span>
+            <span class="s2">"content"</span><span class="p">:</span> <span class="n">article</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"title"</span><span class="p">],</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"generator"</span><span class="p">,</span>
+            <span class="s2">"property"</span><span class="p">:</span> <span class="s2">"generator"</span><span class="p">,</span>
+            <span class="s2">"content"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"markata </span><span class="si">{</span><span class="n">__version__</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">]</span>
+    <span class="k">return</span> <span class="n">seo</span>
+</code></pre>
+   </div>
+  </details>
+  <hr/>
+  <h2 id="_add_seo_tags-function">
+   _add_seo_tags
+   <code>
+    function
+   </code>
+   <a class="heading-permalink" href="#_add_seo_tags-function">
+    <span class="visually-hidden">
+    </span>
+    <svg aria-hidden="true" fill="currentColor" focusable="false" height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg">
+     <path d="M9.199 13.599a5.99 5.99 0 0 0 3.949 2.345 5.987 5.987 0 0 0 5.105-1.702l2.995-2.994a5.992 5.992 0 0 0 1.695-4.285 5.976 5.976 0 0 0-1.831-4.211 5.99 5.99 0 0 0-6.431-1.242 6.003 6.003 0 0 0-1.905 1.24l-1.731 1.721a.999.999 0 1 0 1.41 1.418l1.709-1.699a3.985 3.985 0 0 1 2.761-1.123 3.975 3.975 0 0 1 2.799 1.122 3.997 3.997 0 0 1 .111 5.644l-3.005 3.006a3.982 3.982 0 0 1-3.395 1.126 3.987 3.987 0 0 1-2.632-1.563A1 1 0 0 0 9.201 13.6zm5.602-3.198a5.99 5.99 0 0 0-3.949-2.345 5.987 5.987 0 0 0-5.105 1.702l-2.995 2.994a5.992 5.992 0 0 0-1.695 4.285 5.976 5.976 0 0 0 1.831 4.211 5.99 5.99 0 0 0 6.431 1.242 6.003 6.003 0 0 0 1.905-1.24l1.723-1.723a.999.999 0 1 0-1.414-1.414L9.836 19.81a3.985 3.985 0 0 1-2.761 1.123 3.975 3.975 0 0 1-2.799-1.122 3.997 3.997 0 0 1-.111-5.644l3.005-3.006a3.982 3.982 0 0 1 3.395-1.126 3.987 3.987 0 0 1 2.632 1.563 1 1 0 0 0 1.602-1.198z">
+     </path>
+    </svg>
+   </a>
+  </h2>
+  <p>
+   None
+  </p>
+  <details>
+   <summary>
+    _add_seo_tags source
+   </summary>
+   <div class="highlight">
+    <pre><span></span><code><span class="k">def</span> <span class="nf">_add_seo_tags</span><span class="p">(</span><span class="n">seo</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="n">article</span><span class="p">:</span> <span class="s2">"frontmatter.Post"</span><span class="p">,</span> <span class="n">soup</span><span class="p">:</span> <span class="n">BeautifulSoup</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">meta</span> <span class="ow">in</span> <span class="n">seo</span><span class="p">:</span>
+        <span class="n">soup</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_create_seo_tag</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">soup</span><span class="p">))</span>
+</code></pre>
+   </div>
+  </details>
+  <hr/>
+  <h2 id="_create_seo_tag-function">
+   _create_seo_tag
+   <code>
+    function
+   </code>
+   <a class="heading-permalink" href="#_create_seo_tag-function">
+    <span class="visually-hidden">
+    </span>
+    <svg aria-hidden="true" fill="currentColor" focusable="false" height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg">
+     <path d="M9.199 13.599a5.99 5.99 0 0 0 3.949 2.345 5.987 5.987 0 0 0 5.105-1.702l2.995-2.994a5.992 5.992 0 0 0 1.695-4.285 5.976 5.976 0 0 0-1.831-4.211 5.99 5.99 0 0 0-6.431-1.242 6.003 6.003 0 0 0-1.905 1.24l-1.731 1.721a.999.999 0 1 0 1.41 1.418l1.709-1.699a3.985 3.985 0 0 1 2.761-1.123 3.975 3.975 0 0 1 2.799 1.122 3.997 3.997 0 0 1 .111 5.644l-3.005 3.006a3.982 3.982 0 0 1-3.395 1.126 3.987 3.987 0 0 1-2.632-1.563A1 1 0 0 0 9.201 13.6zm5.602-3.198a5.99 5.99 0 0 0-3.949-2.345 5.987 5.987 0 0 0-5.105 1.702l-2.995 2.994a5.992 5.992 0 0 0-1.695 4.285 5.976 5.976 0 0 0 1.831 4.211 5.99 5.99 0 0 0 6.431 1.242 6.003 6.003 0 0 0 1.905-1.24l1.723-1.723a.999.999 0 1 0-1.414-1.414L9.836 19.81a3.985 3.985 0 0 1-2.761 1.123 3.975 3.975 0 0 1-2.799-1.122 3.997 3.997 0 0 1-.111-5.644l3.005-3.006a3.982 3.982 0 0 1 3.395-1.126 3.987 3.987 0 0 1 2.632 1.563 1 1 0 0 0 1.602-1.198z">
+     </path>
+    </svg>
+   </a>
+  </h2>
+  <p>
+   None
+  </p>
+  <details>
+   <summary>
+    _create_seo_tag source
+   </summary>
+   <div class="highlight">
+    <pre><span></span><code><span class="k">def</span> <span class="nf">_create_seo_tag</span><span class="p">(</span><span class="n">meta</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">soup</span><span class="p">:</span> <span class="n">BeautifulSoup</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Tag"</span><span class="p">:</span>
+    <span class="n">tag</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">new_tag</span><span class="p">(</span><span class="s2">"meta"</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
+        <span class="n">tag</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">tag</span>
+</code></pre>
+   </div>
+  </details>
+  <hr/>
+  <h2 id="render-function">
+   render
+   <code>
+    function
+   </code>
+   <a class="heading-permalink" href="#render-function">
+    <span class="visually-hidden">
+    </span>
+    <svg aria-hidden="true" fill="currentColor" focusable="false" height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg">
+     <path d="M9.199 13.599a5.99 5.99 0 0 0 3.949 2.345 5.987 5.987 0 0 0 5.105-1.702l2.995-2.994a5.992 5.992 0 0 0 1.695-4.285 5.976 5.976 0 0 0-1.831-4.211 5.99 5.99 0 0 0-6.431-1.242 6.003 6.003 0 0 0-1.905 1.24l-1.731 1.721a.999.999 0 1 0 1.41 1.418l1.709-1.699a3.985 3.985 0 0 1 2.761-1.123 3.975 3.975 0 0 1 2.799 1.122 3.997 3.997 0 0 1 .111 5.644l-3.005 3.006a3.982 3.982 0 0 1-3.395 1.126 3.987 3.987 0 0 1-2.632-1.563A1 1 0 0 0 9.201 13.6zm5.602-3.198a5.99 5.99 0 0 0-3.949-2.345 5.987 5.987 0 0 0-5.105 1.702l-2.995 2.994a5.992 5.992 0 0 0-1.695 4.285 5.976 5.976 0 0 0 1.831 4.211 5.99 5.99 0 0 0 6.431 1.242 6.003 6.003 0 0 0 1.905-1.24l1.723-1.723a.999.999 0 1 0-1.414-1.414L9.836 19.81a3.985 3.985 0 0 1-2.761 1.123 3.975 3.975 0 0 1-2.799-1.122 3.997 3.997 0 0 1-.111-5.644l3.005-3.006a3.982 3.982 0 0 1 3.395-1.126 3.987 3.987 0 0 1 2.632 1.563 1 1 0 0 0 1.602-1.198z">
+     </path>
+    </svg>
+   </a>
+  </h2>
+  <p>
+   None
+  </p>
+  <details>
+   <summary>
+    render source
+   </summary>
+   <div class="highlight">
+    <pre><span></span><code><span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">markata</span><span class="p">:</span> <span class="n">Markata</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+    <span class="n">url</span> <span class="o">=</span> <span class="n">markata</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="s2">"url"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span>
+    <span class="n">images_url</span> <span class="o">=</span> <span class="n">markata</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="s2">"images_url"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">url</span> <span class="ow">or</span> <span class="s2">""</span>
+    <span class="n">site_name</span> <span class="o">=</span> <span class="n">markata</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="s2">"site_name"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span>
+    <span class="n">author_name</span> <span class="o">=</span> <span class="n">markata</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="s2">"author_name"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span>
+    <span class="n">author_email</span> <span class="o">=</span> <span class="n">markata</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="s2">"author_email"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span>
+    <span class="n">twitter_creator</span> <span class="o">=</span> <span class="n">markata</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="s2">"twitter_creator"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span>
+    <span class="n">twitter_card</span> <span class="o">=</span> <span class="n">markata</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="s2">"twitter_card"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">"summary_large_image"</span>
+    <span class="n">config_seo</span> <span class="o">=</span> <span class="n">markata</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="s2">"seo"</span><span class="p">,</span> <span class="n">warn</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="k">with</span> <span class="n">markata</span><span class="o">.</span><span class="n">cache</span> <span class="k">as</span> <span class="n">cache</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">article</span> <span class="ow">in</span> <span class="n">markata</span><span class="o">.</span><span class="n">iter_articles</span><span class="p">(</span><span class="s2">"add seo tags from seo.py"</span><span class="p">):</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">markata</span><span class="o">.</span><span class="n">make_hash</span><span class="p">(</span>
+                <span class="s2">"seo"</span><span class="p">,</span>
+                <span class="s2">"render"</span><span class="p">,</span>
+                <span class="n">article</span><span class="o">.</span><span class="n">html</span><span class="p">,</span>
+                <span class="n">site_name</span><span class="p">,</span>
+                <span class="n">url</span><span class="p">,</span>
+                <span class="n">article</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"slug"</span><span class="p">],</span>
+                <span class="n">twitter_card</span><span class="p">,</span>
+                <span class="n">article</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"title"</span><span class="p">],</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">config_seo</span><span class="p">),</span>
+            <span class="p">)</span>
+
+            <span class="n">html_from_cache</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">html_from_cache</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">article</span><span class="o">.</span><span class="n">html</span><span class="p">,</span> <span class="n">features</span><span class="o">=</span><span class="s2">"lxml"</span><span class="p">)</span>
+                <span class="n">seo</span> <span class="o">=</span> <span class="n">_create_seo</span><span class="p">(</span>
+                    <span class="n">markata</span><span class="o">=</span><span class="n">markata</span><span class="p">,</span>
+                    <span class="n">soup</span><span class="o">=</span><span class="n">soup</span><span class="p">,</span>
+                    <span class="n">article</span><span class="o">=</span><span class="n">article</span><span class="p">,</span>
+                    <span class="n">site_name</span><span class="o">=</span><span class="n">site_name</span><span class="p">,</span>
+                    <span class="n">author_name</span><span class="o">=</span><span class="n">author_name</span><span class="p">,</span>
+                    <span class="n">author_email</span><span class="o">=</span><span class="n">author_email</span><span class="p">,</span>
+                    <span class="n">twitter_card</span><span class="o">=</span><span class="n">twitter_card</span><span class="p">,</span>
+                    <span class="n">twitter_creator</span><span class="o">=</span><span class="n">twitter_creator</span><span class="p">,</span>
+                    <span class="n">config_seo</span><span class="o">=</span><span class="n">config_seo</span><span class="p">,</span>
+                    <span class="n">images_url</span><span class="o">=</span><span class="n">images_url</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">_add_seo_tags</span><span class="p">(</span><span class="n">seo</span><span class="p">,</span> <span class="n">article</span><span class="p">,</span> <span class="n">soup</span><span class="p">)</span>
+                <span class="n">canonical_link</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">new_tag</span><span class="p">(</span><span class="s2">"link"</span><span class="p">)</span>
+                <span class="n">canonical_link</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">"rel"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"canonical"</span>
+                <span class="k">if</span> <span class="n">article</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"slug"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"index"</span><span class="p">:</span>
+                    <span class="n">canonical_link</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">"href"</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">/"</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">canonical_link</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">"href"</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">article</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"slug"</span><span class="p">]</span><span class="si">}</span><span class="s1">/'</span>
+                <span class="n">soup</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">canonical_link</span><span class="p">)</span>
+
+                <span class="n">meta_url</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">new_tag</span><span class="p">(</span><span class="s2">"meta"</span><span class="p">)</span>
+                <span class="n">meta_url</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">"name"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"og:url"</span>
+                <span class="n">meta_url</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">"property"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"og:url"</span>
+                <span class="k">if</span> <span class="n">article</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"slug"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"index"</span><span class="p">:</span>
+                    <span class="n">meta_url</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">"content"</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">/"</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">meta_url</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">"content"</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">article</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"slug"</span><span class="p">]</span><span class="si">}</span><span class="s1">/'</span>
+                <span class="n">soup</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">meta_url</span><span class="p">)</span>
+
+                <span class="n">html</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">prettify</span><span class="p">()</span>
+                <span class="n">cache</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">html</span><span class="p">,</span> <span class="n">expire</span><span class="o">=</span><span class="n">markata</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">"default_cache_expire"</span><span class="p">])</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">html</span> <span class="o">=</span> <span class="n">html_from_cache</span>
+            <span class="n">article</span><span class="o">.</span><span class="n">html</span> <span class="o">=</span> <span class="n">html</span>
+</code></pre>
+   </div>
+  </details>
+  <footer>
+   © 2022
+  </footer>
+ </body>
+</html>

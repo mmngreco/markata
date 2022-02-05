@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <title>
+   base_cli.py
+  </title>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <style>
+   /* 
+      #c678dd -> #c678dd
+      #c678dd ->
+      #a6e22e -> #61afef
+      */
+      html  { background: #1f2022; color: #eefbfe }
+      a { color: #47cbff; }
+      body { max-width: 800px; margin: auto; font-size: 1rem; line-height: 1.56;}
+      blockquote {
+        border-left: 5px solid #e1bd00c9;
+        padding-left: 1rem;
+        margin: 1rem;
+        }
+      li.post {
+        list-style-type: None;
+        padding: .2rem 0;
+      }
+      pre {padding: 1rem}
+      code {color: #e672e6; 
+        background-color: rgba(255,255,255, .05);
+        background-color: #1b1c1e;
+      }
+      pre {
+        padding: 1rem;
+        max-width: fit-content;
+        overflow-x: auto;
+      }
+        padding: .15rem .3rem;
+      }
+
+      .highlight .hll { background-color: #49483e }
+      .highlight  { background: #272822; color: #abb2bf;
+        background-color: #1b1c1e;
+
+      }
+      .highlight .c { color: #8b8b8b } /* Comment */
+      .highlight .err { color: #960050; background-color: #1e0010 } /* Error */
+      .highlight .k { color: #c678dd } /* Keyword */
+      .highlight .l { color: #ae81ff } /* Literal */
+      .highlight .n { color: #abb2bf } /* Name */
+      .highlight .o { color: #c678dd } /* Operator */
+      .highlight .p { color: #abb2bf } /* Punctuation */
+      .highlight .ch { color: #8b8b8b } /* Comment.Hashbang */
+      .highlight .cm { color: #8b8b8b } /* Comment.Multiline */
+      .highlight .cp { color: #8b8b8b } /* Comment.Preproc */
+      .highlight .cpf { color: #8b8b8b } /* Comment.PreprocFile */
+      .highlight .c1 { color: #8b8b8b } /* Comment.Single */
+      .highlight .cs { color: #8b8b8b } /* Comment.Special */
+      .highlight .gd { color: #c678dd } /* Generic.Deleted */
+      .highlight .ge { font-style: italic } /* Generic.Emph */
+      .highlight .gi { color: #a6e22e } /* Generic.Inserted */
+      .highlight .gs { font-weight: bold } /* Generic.Strong */
+      .highlight .gu { color: #8b8b8b } /* Generic.Subheading */
+      .highlight .kc { color: #c678dd } /* Keyword.Constant */
+      .highlight .kd { color: #c678dd } /* Keyword.Declaration */
+      .highlight .kn { color: #c678dd } /* Keyword.Namespace */
+      .highlight .kp { color: #c678dd } /* Keyword.Pseudo */
+      .highlight .kr { color: #c678dd } /* Keyword.Reserved */
+      .highlight .kt { color: #c678dd } /* Keyword.Type */
+      .highlight .ld { color: #e6db74 } /* Literal.Date */
+      .highlight .m { color: #ae81ff } /* Literal.Number */
+      .highlight .s { color: #e6db74 } /* Literal.String */
+      .highlight .na { color: #a6e22e } /* Name.Attribute */
+      .highlight .nb { color: #98c379 } /* Name.Builtin */
+      .highlight .nc { color: #abb2bf } /* Name.Class */
+      .highlight .no { color: #c678dd } /* Name.Constant */
+      .highlight .nd { color: #abb2bf } /* Name.Decorator */
+      .highlight .ni { color: #abb2bf } /* Name.Entity */
+      .highlight .ne { color: #a6e22e } /* Name.Exception */
+      .highlight .nf { color: #61afef } /* Name.Function */
+      .highlight .nl { color: #abb2bf } /* Name.Label */
+      .highlight .nn { color: #abb2bf } /* Name.Namespace */
+      .highlight .nx { color: #a6e22e } /* Name.Other */
+      .highlight .py { color: #abb2bf } /* Name.Property */
+      .highlight .nt { color: #c678dd } /* Name.Tag */
+      .highlight .nv { color: #abb2bf } /* Name.Variable */
+      .highlight .ow { color: #c678dd } /* Operator.Word */
+      .highlight .w { color: #abb2bf } /* Text.Whitespace */
+      .highlight .mb { color: #ae81ff } /* Literal.Number.Bin */
+      .highlight .mf { color: #ae81ff } /* Literal.Number.Float */
+      .highlight .mh { color: #ae81ff } /* Literal.Number.Hex */
+      .highlight .mi { color: #ae81ff } /* Literal.Number.Integer */
+      .highlight .mo { color: #ae81ff } /* Literal.Number.Oct */
+      .highlight .sa { color: #e6db74 } /* Literal.String.Affix */
+      .highlight .sb { color: #e6db74 } /* Literal.String.Backtick */
+      .highlight .sc { color: #e6db74 } /* Literal.String.Char */
+      .highlight .dl { color: #e6db74 } /* Literal.String.Delimiter */
+      .highlight .sd { color: #98c379 } /* Literal.String.Doc */
+      .highlight .s2 { color: #98c379 } /* Literal.String.Double */
+      .highlight .se { color: #ae81ff } /* Literal.String.Escape */
+      .highlight .sh { color: #e6db74 } /* Literal.String.Heredoc */
+      .highlight .si { color: #e6db74 } /* Literal.String.Interpol */
+      .highlight .sx { color: #e6db74 } /* Literal.String.Other */
+      .highlight .sr { color: #e6db74 } /* Literal.String.Regex */
+      .highlight .s1 { color: #e6db74 } /* Literal.String.Single */
+      .highlight .ss { color: #e6db74 } /* Literal.String.Symbol */
+      .highlight .bp { color: #abb2bf } /* Name.Builtin.Pseudo */
+      .highlight .fm { color: #61afef } /* Name.Function.Magic */
+      .highlight .vc { color: #abb2bf } /* Name.Variable.Class */
+      .highlight .vg { color: #abb2bf } /* Name.Variable.Global */
+      .highlight .vi { color: #abb2bf } /* Name.Variable.Instance */
+      .highlight .vm { color: #abb2bf } /* Name.Variable.Magic */
+      .highlight .il { color: #ae81ff } /* Literal.Number.Integer.Long */
+
+/* Tab style starts here */
+.tabbed-set {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  margin: 1em 0;
+  border-radius: 0.1rem;
+}
+
+.tabbed-set > input {
+  display: none;
+}
+
+.tabbed-set label {
+  width: auto;
+  padding: 0.9375em 1.25em 0.78125em;
+  font-weight: 700;
+  font-size: 0.84em;
+  white-space: nowrap;
+  border-bottom: 0.15rem solid transparent;
+  border-top-left-radius: 0.1rem;
+  border-top-right-radius: 0.1rem;
+  cursor: pointer;
+  transition: background-color 250ms, color 250ms;
+}
+
+.tabbed-set .tabbed-content {
+  width: 100%;
+  display: none;
+  box-shadow: 0 -.05rem #ddd;
+}
+
+.tabbed-set input {
+  position: absolute;
+  opacity: 0;
+}
+
+/* fonts */
+h1 {
+    font-weight: 700;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: "Space Mono", monospace;
+}
+
+h1 {
+    font-size: 2.5em;
+}
+
+h2 {
+    font-size: 1.63rem;
+}
+
+
+p {
+    font-family: "Space Mono", monospace;
+    font-size: 21px;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+@media only screen and (max-width: 700px) {
+    p {
+        font-size: 18px;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    p {
+        font-size: 16px;
+    }
+}
+
+@media only screen and (max-width: 500px) {
+    p {
+        font-size: 14px;
+    }
+}
+
+@media only screen and (max-width: 400px) {
+    p {
+        font-size: 12px;
+    }
+}
+
+blockquote {
+    font-family: "Space Mono", monospace;
+}
+
+code {
+    font-family: "Space Mono", monospace;
+}
+
+pre {
+    font-family: "Segoe UI", Frutiger, "Frutiger Linotype", "Dejavu Sans", "Helvetica Neue", Arial, sans-serif;
+    font-family: "Space Mono", monospace;
+    font-family: "Space Mono", monospace;
+    /* font-size: 13px;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: 400;
+    line-height: 18.5714px; */
+}
+
+a {
+
+    font-family: "Space Mono", monospace;
+    font-weight: 600;
+    text-decoration-color: goldenrod;
+    color: #6ab1cd;
+    padding: .3rem .5rem;
+    display: inline-block;
+}
+
+.admonition {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    text-align: left;
+}
+
+.admonition.note {
+    color: #79d3e6;
+    background-color: #123c52;
+    border-color: #1c7183;
+}
+
+.admonition.warning {
+    color: #e6ca7a;
+    background-color: #4f4409;
+    border-color: #855c0d;
+}
+
+.admonition.danger {
+    color: #e67471;
+    background-color: #461c1c;
+    border-color: #6e2b33;
+}
+
+.admonition-title {
+    font-weight: bold;
+    text-align: left;
+}
+
+table {
+    margin: 1rem 0;
+    border-collapse: collapse;
+    border-spacing: 0;
+    display: block;
+    max-width: -moz-fit-content;
+    max-width: fit-content;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+table thead th {
+    border: solid 1px #ffffff42;
+    padding: 10px;
+    text-align: left;
+}
+
+table tbody td {
+    border: solid 1px #ffffff42;
+    padding: 10px;
+}
+  </style>
+  <meta content="Waylon Walker" name="og:author" property="og:author"/>
+  <meta content="waylon@waylonwalaker.com" name="og:author_email" property="og:author_email"/>
+  <meta content="website" name="og:type" property="og:type"/>
+  <meta content="Docs for base_cli" name="description" property="description"/>
+  <meta content="Docs for base_cli" name="og:description" property="og:description"/>
+  <meta content="Docs for base_cli" name="twitter:description" property="twitter:description"/>
+  <meta content="base_cli.py | Markata" name="og:title" property="og:title"/>
+  <meta content="base_cli.py | Markata" name="twitter:title" property="twitter:title"/>
+  <meta content="https://markata.dev/markata/plugins/base_cli-og.png" name="og:image" property="og:image"/>
+  <meta content="https://markata.dev/markata/plugins/base_cli-og.png" name="twitter:image" property="twitter:image"/>
+  <meta content="1600" name="og:image:width" property="og:image:width"/>
+  <meta content="900" name="og:image:width" property="og:image:width"/>
+  <meta content="summary_large_image" name="twitter:card" property="twitter:card"/>
+  <meta content="Markata" name="og:site_name" property="og:site_name"/>
+  <meta content="@_waylonwalker" name="twitter:creator" property="twitter:creator"/>
+  <meta content="base_cli.py" name="title" property="title"/>
+  <meta content="markata 0.1.0" name="generator" property="generator"/>
+  <link href="https://markata.dev/markata/plugins/base_cli/" rel="canonical"/>
+  <meta content="https://markata.dev/markata/plugins/base_cli/" name="og:url" property="og:url"/>
+ </head>
+ <body>
+  <h1>
+   base_cli.py
+   <a class="heading-permalink" href="#None">
+    <span class="visually-hidden">
+    </span>
+    <svg aria-hidden="true" fill="currentColor" focusable="false" height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg">
+     <path d="M9.199 13.599a5.99 5.99 0 0 0 3.949 2.345 5.987 5.987 0 0 0 5.105-1.702l2.995-2.994a5.992 5.992 0 0 0 1.695-4.285 5.976 5.976 0 0 0-1.831-4.211 5.99 5.99 0 0 0-6.431-1.242 6.003 6.003 0 0 0-1.905 1.24l-1.731 1.721a.999.999 0 1 0 1.41 1.418l1.709-1.699a3.985 3.985 0 0 1 2.761-1.123 3.975 3.975 0 0 1 2.799 1.122 3.997 3.997 0 0 1 .111 5.644l-3.005 3.006a3.982 3.982 0 0 1-3.395 1.126 3.987 3.987 0 0 1-2.632-1.563A1 1 0 0 0 9.201 13.6zm5.602-3.198a5.99 5.99 0 0 0-3.949-2.345 5.987 5.987 0 0 0-5.105 1.702l-2.995 2.994a5.992 5.992 0 0 0-1.695 4.285 5.976 5.976 0 0 0 1.831 4.211 5.99 5.99 0 0 0 6.431 1.242 6.003 6.003 0 0 0 1.905-1.24l1.723-1.723a.999.999 0 1 0-1.414-1.414L9.836 19.81a3.985 3.985 0 0 1-2.761 1.123 3.975 3.975 0 0 1-2.799-1.122 3.997 3.997 0 0 1-.111-5.644l3.005-3.006a3.982 3.982 0 0 1 3.395-1.126 3.987 3.987 0 0 1 2.632 1.563 1 1 0 0 0 1.602-1.198z">
+     </path>
+    </svg>
+   </a>
+  </h1>
+  <p>
+   Markata's base command line commands.
+  </p>
+  <p>
+   This plugin enables
+   <a href="https://markata.dev/markata/plugins/base_cli/#build-function">
+    <code>
+     build
+    </code>
+   </a>
+   and
+   <a href="https://markata.dev/markata/plugins/base_cli/#list-function">
+    <code>
+     list
+    </code>
+   </a>
+   commands as part of the main markata cli.
+  </p>
+  <h2 id="building-your-site-with-the-cli">
+   Building Your Site with the Cli
+   <a class="heading-permalink" href="#building-your-site-with-the-cli">
+    <span class="visually-hidden">
+    </span>
+    <svg aria-hidden="true" fill="currentColor" focusable="false" height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg">
+     <path d="M9.199 13.599a5.99 5.99 0 0 0 3.949 2.345 5.987 5.987 0 0 0 5.105-1.702l2.995-2.994a5.992 5.992 0 0 0 1.695-4.285 5.976 5.976 0 0 0-1.831-4.211 5.99 5.99 0 0 0-6.431-1.242 6.003 6.003 0 0 0-1.905 1.24l-1.731 1.721a.999.999 0 1 0 1.41 1.418l1.709-1.699a3.985 3.985 0 0 1 2.761-1.123 3.975 3.975 0 0 1 2.799 1.122 3.997 3.997 0 0 1 .111 5.644l-3.005 3.006a3.982 3.982 0 0 1-3.395 1.126 3.987 3.987 0 0 1-2.632-1.563A1 1 0 0 0 9.201 13.6zm5.602-3.198a5.99 5.99 0 0 0-3.949-2.345 5.987 5.987 0 0 0-5.105 1.702l-2.995 2.994a5.992 5.992 0 0 0-1.695 4.285 5.976 5.976 0 0 0 1.831 4.211 5.99 5.99 0 0 0 6.431 1.242 6.003 6.003 0 0 0 1.905-1.24l1.723-1.723a.999.999 0 1 0-1.414-1.414L9.836 19.81a3.985 3.985 0 0 1-2.761 1.123 3.975 3.975 0 0 1-2.799-1.122 3.997 3.997 0 0 1-.111-5.644l3.005-3.006a3.982 3.982 0 0 1 3.395-1.126 3.987 3.987 0 0 1 2.632 1.563 1 1 0 0 0 1.602-1.198z">
+     </path>
+    </svg>
+   </a>
+  </h2>
+  <p>
+   Your Markata Site can be build completely from the command line.
+  </p>
+  <div class="highlight">
+   <pre><span></span><code>markata build
+
+<span class="c1"># or if you prefer pipx</span>
+pipx run markata build
+</code></pre>
+  </div>
+  <p>
+   see the
+   <a href="https://markata.dev/markata/plugins/base_cli/#build-function">
+    <code>
+     build
+    </code>
+   </a>
+   section for more examples.
+  </p>
+  <h2 id="listing-your-articles">
+   Listing your articles
+   <a class="heading-permalink" href="#listing-your-articles">
+    <span class="visually-hidden">
+    </span>
+    <svg aria-hidden="true" fill="currentColor" focusable="false" height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg">
+     <path d="M9.199 13.599a5.99 5.99 0 0 0 3.949 2.345 5.987 5.987 0 0 0 5.105-1.702l2.995-2.994a5.992 5.992 0 0 0 1.695-4.285 5.976 5.976 0 0 0-1.831-4.211 5.99 5.99 0 0 0-6.431-1.242 6.003 6.003 0 0 0-1.905 1.24l-1.731 1.721a.999.999 0 1 0 1.41 1.418l1.709-1.699a3.985 3.985 0 0 1 2.761-1.123 3.975 3.975 0 0 1 2.799 1.122 3.997 3.997 0 0 1 .111 5.644l-3.005 3.006a3.982 3.982 0 0 1-3.395 1.126 3.987 3.987 0 0 1-2.632-1.563A1 1 0 0 0 9.201 13.6zm5.602-3.198a5.99 5.99 0 0 0-3.949-2.345 5.987 5.987 0 0 0-5.105 1.702l-2.995 2.994a5.992 5.992 0 0 0-1.695 4.285 5.976 5.976 0 0 0 1.831 4.211 5.99 5.99 0 0 0 6.431 1.242 6.003 6.003 0 0 0 1.905-1.24l1.723-1.723a.999.999 0 1 0-1.414-1.414L9.836 19.81a3.985 3.985 0 0 1-2.761 1.123 3.975 3.975 0 0 1-2.799-1.122 3.997 3.997 0 0 1-.111-5.644l3.005-3.006a3.982 3.982 0 0 1 3.395-1.126 3.987 3.987 0 0 1 2.632 1.563 1 1 0 0 0 1.602-1.198z">
+     </path>
+    </svg>
+   </a>
+  </h2>
+  <p>
+   Markata list is a tool to help list out artile attributes right to your
+terminal.  This is very helpful to find articles on larger sites, or
+debug what is getting picked up by markata.
+  </p>
+  <div class="highlight">
+   <pre><span></span><code>markata list --map <span class="s1">'str(date.year) + "," + title'</span>
+</code></pre>
+  </div>
+  <p>
+   see the
+   <a href="https://markata.dev/markata/plugins/base_cli/#list-function">
+    <code>
+     list
+    </code>
+   </a>
+   section for more examples.
+  </p>
+  <hr/>
+  <h2 id="make_pretty-function">
+   make_pretty
+   <code>
+    function
+   </code>
+   <a class="heading-permalink" href="#make_pretty-function">
+    <span class="visually-hidden">
+    </span>
+    <svg aria-hidden="true" fill="currentColor" focusable="false" height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg">
+     <path d="M9.199 13.599a5.99 5.99 0 0 0 3.949 2.345 5.987 5.987 0 0 0 5.105-1.702l2.995-2.994a5.992 5.992 0 0 0 1.695-4.285 5.976 5.976 0 0 0-1.831-4.211 5.99 5.99 0 0 0-6.431-1.242 6.003 6.003 0 0 0-1.905 1.24l-1.731 1.721a.999.999 0 1 0 1.41 1.418l1.709-1.699a3.985 3.985 0 0 1 2.761-1.123 3.975 3.975 0 0 1 2.799 1.122 3.997 3.997 0 0 1 .111 5.644l-3.005 3.006a3.982 3.982 0 0 1-3.395 1.126 3.987 3.987 0 0 1-2.632-1.563A1 1 0 0 0 9.201 13.6zm5.602-3.198a5.99 5.99 0 0 0-3.949-2.345 5.987 5.987 0 0 0-5.105 1.702l-2.995 2.994a5.992 5.992 0 0 0-1.695 4.285 5.976 5.976 0 0 0 1.831 4.211 5.99 5.99 0 0 0 6.431 1.242 6.003 6.003 0 0 0 1.905-1.24l1.723-1.723a.999.999 0 1 0-1.414-1.414L9.836 19.81a3.985 3.985 0 0 1-2.761 1.123 3.975 3.975 0 0 1-2.799-1.122 3.997 3.997 0 0 1-.111-5.644l3.005-3.006a3.982 3.982 0 0 1 3.395-1.126 3.987 3.987 0 0 1 2.632 1.563 1 1 0 0 0 1.602-1.198z">
+     </path>
+    </svg>
+   </a>
+  </h2>
+  <p>
+   This is a helper function that enables suppresses tracebacks from
+frameworks like
+   <code>
+    click
+   </code>
+   that can make your traceback long and hard
+to follow.  It also makes evrerything more colorful and easier to
+follow.
+  </p>
+  <details>
+   <summary>
+    make_pretty source
+   </summary>
+   <div class="highlight">
+    <pre><span></span><code><span class="k">def</span> <span class="nf">make_pretty</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">"""</span>
+<span class="sd">    This is a helper function that enables suppresses tracebacks from</span>
+<span class="sd">    frameworks like `click` that can make your traceback long and hard</span>
+<span class="sd">    to follow.  It also makes evrerything more colorful and easier to</span>
+<span class="sd">    follow.</span>
+<span class="sd">    """</span>
+    <span class="kn">import</span> <span class="nn">click</span>
+    <span class="kn">import</span> <span class="nn">pluggy</span>
+    <span class="kn">import</span> <span class="nn">typer</span>
+    <span class="kn">from</span> <span class="nn">rich</span> <span class="kn">import</span> <span class="n">pretty</span> <span class="k">as</span> <span class="n">_pretty</span>
+    <span class="kn">from</span> <span class="nn">rich</span> <span class="kn">import</span> <span class="n">traceback</span>
+
+    <span class="n">_pretty</span><span class="o">.</span><span class="n">install</span><span class="p">()</span>
+    <span class="n">traceback</span><span class="o">.</span><span class="n">install</span><span class="p">(</span>
+        <span class="n">show_locals</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">suppress</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">pluggy</span><span class="p">,</span>
+            <span class="n">click</span><span class="p">,</span>
+            <span class="n">typer</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+</code></pre>
+   </div>
+  </details>
+  <hr/>
+  <h2 id="cli-function">
+   cli
+   <code>
+    function
+   </code>
+   <a class="heading-permalink" href="#cli-function">
+    <span class="visually-hidden">
+    </span>
+    <svg aria-hidden="true" fill="currentColor" focusable="false" height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg">
+     <path d="M9.199 13.599a5.99 5.99 0 0 0 3.949 2.345 5.987 5.987 0 0 0 5.105-1.702l2.995-2.994a5.992 5.992 0 0 0 1.695-4.285 5.976 5.976 0 0 0-1.831-4.211 5.99 5.99 0 0 0-6.431-1.242 6.003 6.003 0 0 0-1.905 1.24l-1.731 1.721a.999.999 0 1 0 1.41 1.418l1.709-1.699a3.985 3.985 0 0 1 2.761-1.123 3.975 3.975 0 0 1 2.799 1.122 3.997 3.997 0 0 1 .111 5.644l-3.005 3.006a3.982 3.982 0 0 1-3.395 1.126 3.987 3.987 0 0 1-2.632-1.563A1 1 0 0 0 9.201 13.6zm5.602-3.198a5.99 5.99 0 0 0-3.949-2.345 5.987 5.987 0 0 0-5.105 1.702l-2.995 2.994a5.992 5.992 0 0 0-1.695 4.285 5.976 5.976 0 0 0 1.831 4.211 5.99 5.99 0 0 0 6.431 1.242 6.003 6.003 0 0 0 1.905-1.24l1.723-1.723a.999.999 0 1 0-1.414-1.414L9.836 19.81a3.985 3.985 0 0 1-2.761 1.123 3.975 3.975 0 0 1-2.799-1.122 3.997 3.997 0 0 1-.111-5.644l3.005-3.006a3.982 3.982 0 0 1 3.395-1.126 3.987 3.987 0 0 1 2.632 1.563 1 1 0 0 0 1.602-1.198z">
+     </path>
+    </svg>
+   </a>
+  </h2>
+  <p>
+   Markata hook to implement base cli commands.
+  </p>
+  <details>
+   <summary>
+    cli source
+   </summary>
+   <div class="highlight">
+    <pre><span></span><code><span class="k">def</span> <span class="nf">cli</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="n">typer</span><span class="o">.</span><span class="n">Typer</span><span class="p">,</span> <span class="n">markata</span><span class="p">:</span> <span class="s2">"Markata"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">"""</span>
+<span class="sd">    Markata hook to implement base cli commands.</span>
+<span class="sd">    """</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span>
+        <span class="n">pretty</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+            <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">"--quiet"</span><span class="p">,</span>
+            <span class="s2">"-q"</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="c1"># to_dict: bool = False,</span>
+        <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+            <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">"--verbose"</span><span class="p">,</span>
+            <span class="s2">"-v"</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">should_pdb</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+            <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">"--pdb"</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">profile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">"""</span>
+<span class="sd">        Markata's primary way of building your site for production.</span>
+<span class="sd">        By default, running `markta build` will render your markdown to</span>
+<span class="sd">        the `./markout` directory.</span>
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        markata build</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        If you are having an issue and want to pop immediately into a debugger</span>
+<span class="sd">        upon failure you can pass the `--pdb` flag to the build command.</span>
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        markata build  --pdb</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        If you do not like the way rich looks, or its suppressing tracebaks you</span>
+<span class="sd">        would like to remain visible you can use `--no-pretty`</span>
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        markata build --no-pretty</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        If you need to run without any console logging pass in the</span>
+<span class="sd">        `--quiet` flag.</span>
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        markata build --quiet</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        `markta build` will automatically run the pyinstrument profiler</span>
+<span class="sd">        while building your site if you have pyinstrument installed.  It</span>
+<span class="sd">        will echo out your profile in the console as well as write it to</span>
+<span class="sd">        `/_profile` on your built site. If you prefer not to run</span>
+<span class="sd">        pyinstrument profiling, even when it is installed you can pass</span>
+<span class="sd">        in `--no-profile`</span>
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        markata build --no-profile</span>
+<span class="sd">        ```</span>
+<span class="sd">        """</span>
+
+        <span class="k">if</span> <span class="n">pretty</span><span class="p">:</span>
+            <span class="n">make_pretty</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">quiet</span><span class="p">:</span>
+            <span class="n">markata</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">quiet</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">markata</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">"console options:"</span><span class="p">,</span> <span class="n">markata</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">options</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">profile</span><span class="p">:</span>
+            <span class="n">markata</span><span class="o">.</span><span class="n">should_profile_cli</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">markata</span><span class="o">.</span><span class="n">should_profile</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">markata</span><span class="o">.</span><span class="n">configure</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">should_pdb</span><span class="p">:</span>
+            <span class="n">pdb_run</span><span class="p">(</span><span class="n">markata</span><span class="o">.</span><span class="n">run</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">markata</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">list</span><span class="p">(</span>
+        <span class="nb">map</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"title"</span><span class="p">,</span>
+        <span class="nb">filter</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"True"</span><span class="p">,</span>
+        <span class="n">sort</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"True"</span><span class="p">,</span>
+        <span class="n">head</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">tail</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">include_empty</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">reverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">use_pager</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s2">"--pager"</span><span class="p">,</span> <span class="s2">"--no-pager"</span><span class="p">),</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">"""</span>
+<span class="sd">        Provides a way run markatas, map, filter, and sort from the</span>
+<span class="sd">        command line.  I personally use this more often than the build</span>
+<span class="sd">        command while I am writing on a site with a large number of</span>
+<span class="sd">        posts on it.  It makes slicing in by `templatekey`, `tag`, or</span>
+<span class="sd">        `date` much easier.</span>
+
+<span class="sd">        ### default list</span>
+
+<span class="sd">        By default `markata list` will list all titles in a pager, for all posts</span>
+<span class="sd">        being loaded by markata.</span>
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        markata list</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        ### Skip the pager</span>
+
+<span class="sd">        Markata uses rich for its pager, it's pretty smart about when to</span>
+<span class="sd">        use the pager or pass text to the next thing in the pipeline,</span>
+<span class="sd">        but if you don't want to run a pager you can pass  `--no-pager`</span>
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        markata list --no-pager</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        ### List other attributes</span>
+
+<span class="sd">        You can list any other attribute tied to your posts.  These are</span>
+<span class="sd">        added through either your yaml frontmatter at the start of your</span>
+<span class="sd">        post, or through the use of a plugin.</span>
+
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        # the filepath of the post</span>
+<span class="sd">        markata list --map path</span>
+
+<span class="sd">        # the slug of the post (where it will show up on the site)</span>
+<span class="sd">        markata list --map slug</span>
+
+<span class="sd">        # the date of the post</span>
+<span class="sd">        markata list --map date</span>
+
+<span class="sd">        # the full raw content of the post</span>
+<span class="sd">        markata list --map content</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        ### List more than one attribute</span>
+
+<span class="sd">        You can create new attributes as you map to echo out by</span>
+<span class="sd">        combining existing attributes.</span>
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        markata list --map 'title + " , " + slug'</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        ### Using Python objects as map</span>
+
+<span class="sd">        You can access attributes of each post attribute that you map</span>
+<span class="sd">        over.  For instance on my blog, each post has a date that is a</span>
+<span class="sd">        datetime object.  I can ask each post for its `date.year`</span>
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        markata list --map date.year</span>
+
+<span class="sd">        # combining this with title</span>
+<span class="sd">        markata list --map 'str(date.year) + "," + title'</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        ### Filtering posts</span>
+
+<span class="sd">        Posts are filtered with python syntax, you will have all</span>
+<span class="sd">        attributes tied to your posts available to filter with.</span>
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        markata list --filter "'__' not in title"</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        ### Filtering by dates</span>
+
+<span class="sd">        If your site has dates tied to your posts you can filter by</span>
+<span class="sd">        date.  On my blog this makes a ton of sense and is quite useful.</span>
+<span class="sd">        On the Markata docs though it doesn't really make much sense,</span>
+<span class="sd">        since there really isn't the idea of a post date there.</span>
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        # listing today's posts</span>
+<span class="sd">        markata list --filter "date==today"</span>
+
+<span class="sd">        # listing this year's posts</span>
+<span class="sd">        markata list --filter "date.year==today.year"</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        ### Full Content Search</span>
+
+<span class="sd">        You can also search the full content of each post for specific</span>
+<span class="sd">        words.</span>
+<span class="sd">        ``` bash</span>
+
+<span class="sd">        markata list --filter "'python' in content"</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        ### Filtering by frontmatter data</span>
+
+<span class="sd">        I use a templateKey on my personal blog to determine which</span>
+<span class="sd">        template to render the page with.  I can fitler my posts by a</span>
+<span class="sd">        `til` (today i learned) key.</span>
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        markata list --filter "templateKey=='til'"</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        ### Combining filters</span>
+
+<span class="sd">        Filters can be combined together quite like maps can, it's all</span>
+<span class="sd">        just python syntax.</span>
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        markata list --filter "templateKey=='til' and date == today"</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        ### Sorting posts</span>
+
+<span class="sd">        Posts can be sorted by attributes on your post, and they can</span>
+<span class="sd">        even be reversed.</span>
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        markta list --sort date</span>
+<span class="sd">        markta list --sort date --reverse</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        ### Putting it all together</span>
+
+<span class="sd">        The real power of all this comes when you combine them all into</span>
+<span class="sd">        lists that work for you and your workflow.  This really makes</span>
+<span class="sd">        working on larger projects so much easier to find things.</span>
+
+
+<span class="sd">        ### Making a fuzzy picker for your posts</span>
+
+<span class="sd">        Here is a bash command to open an fzf picker for todays posts,</span>
+<span class="sd">        then open it in your `$EDITOR`</span>
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        markata list --map path --filter 'date==today' --sort date --reverse | fzf --preview 'bat --color always {}' | xargs -I {} $EDITOR {}</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        ### Combining wtih nvim Telescope</span>
+
+<span class="sd">        Here is the same command setup as a Telescope picker for neovim.</span>
+
+<span class="sd">        ``` vim</span>
+<span class="sd">        nnoremap &lt;leader&gt;et &lt;cmd&gt;Telescope find_files find_command=markata,list,--map,path,--filter,date==today&lt;cr&gt;</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        If you have another way to open posts in your editor with</span>
+<span class="sd">        `markata list` I would love to accept a PR to add it to the</span>
+<span class="sd">        examples here.</span>
+<span class="sd">        """</span>
+
+        <span class="n">markata</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">quiet</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="n">tail</span> <span class="o">=</span> <span class="o">-</span><span class="n">tail</span> <span class="k">if</span> <span class="n">tail</span> <span class="k">else</span> <span class="n">tail</span>
+        <span class="n">filtered</span> <span class="o">=</span> <span class="n">markata</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">map</span><span class="p">,</span> <span class="nb">filter</span><span class="p">,</span> <span class="n">sort</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">include_empty</span><span class="p">:</span>
+            <span class="n">filtered</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">filtered</span> <span class="k">if</span> <span class="n">a</span> <span class="o">!=</span> <span class="s2">""</span><span class="p">]</span>
+        <span class="n">filtered</span> <span class="o">=</span> <span class="n">filtered</span><span class="p">[</span><span class="n">tail</span><span class="p">:</span><span class="n">head</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">reverse</span><span class="p">:</span>
+            <span class="n">filtered</span> <span class="o">=</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">filtered</span><span class="p">)</span>
+
+        <span class="n">markata</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">quiet</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">markata</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">is_terminal</span> <span class="ow">and</span> <span class="n">use_pager</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">markata</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">pager</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">filtered</span><span class="p">:</span>
+                    <span class="n">markata</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">"purple"</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">filtered</span><span class="p">:</span>
+                <span class="n">markata</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+</code></pre>
+   </div>
+  </details>
+  <hr/>
+  <h2 id="pdb_run-function">
+   pdb_run
+   <code>
+    function
+   </code>
+   <a class="heading-permalink" href="#pdb_run-function">
+    <span class="visually-hidden">
+    </span>
+    <svg aria-hidden="true" fill="currentColor" focusable="false" height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg">
+     <path d="M9.199 13.599a5.99 5.99 0 0 0 3.949 2.345 5.987 5.987 0 0 0 5.105-1.702l2.995-2.994a5.992 5.992 0 0 0 1.695-4.285 5.976 5.976 0 0 0-1.831-4.211 5.99 5.99 0 0 0-6.431-1.242 6.003 6.003 0 0 0-1.905 1.24l-1.731 1.721a.999.999 0 1 0 1.41 1.418l1.709-1.699a3.985 3.985 0 0 1 2.761-1.123 3.975 3.975 0 0 1 2.799 1.122 3.997 3.997 0 0 1 .111 5.644l-3.005 3.006a3.982 3.982 0 0 1-3.395 1.126 3.987 3.987 0 0 1-2.632-1.563A1 1 0 0 0 9.201 13.6zm5.602-3.198a5.99 5.99 0 0 0-3.949-2.345 5.987 5.987 0 0 0-5.105 1.702l-2.995 2.994a5.992 5.992 0 0 0-1.695 4.285 5.976 5.976 0 0 0 1.831 4.211 5.99 5.99 0 0 0 6.431 1.242 6.003 6.003 0 0 0 1.905-1.24l1.723-1.723a.999.999 0 1 0-1.414-1.414L9.836 19.81a3.985 3.985 0 0 1-2.761 1.123 3.975 3.975 0 0 1-2.799-1.122 3.997 3.997 0 0 1-.111-5.644l3.005-3.006a3.982 3.982 0 0 1 3.395-1.126 3.987 3.987 0 0 1 2.632 1.563 1 1 0 0 0 1.602-1.198z">
+     </path>
+    </svg>
+   </a>
+  </h2>
+  <p>
+   Wraps a function call with a post_mortem pdb debugger.
+  </p>
+  <details>
+   <summary>
+    pdb_run source
+   </summary>
+   <div class="highlight">
+    <pre><span></span><code><span class="k">def</span> <span class="nf">pdb_run</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">"""</span>
+<span class="sd">    Wraps a function call with a post_mortem pdb debugger.</span>
+<span class="sd">    """</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">func</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">extype</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">tb</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()</span>
+        <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+        <span class="n">pdb</span><span class="o">.</span><span class="n">post_mortem</span><span class="p">(</span><span class="n">tb</span><span class="p">)</span>
+</code></pre>
+   </div>
+  </details>
+  <hr/>
+  <h2 id="build-function">
+   build
+   <code>
+    function
+   </code>
+   <a class="heading-permalink" href="#build-function">
+    <span class="visually-hidden">
+    </span>
+    <svg aria-hidden="true" fill="currentColor" focusable="false" height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg">
+     <path d="M9.199 13.599a5.99 5.99 0 0 0 3.949 2.345 5.987 5.987 0 0 0 5.105-1.702l2.995-2.994a5.992 5.992 0 0 0 1.695-4.285 5.976 5.976 0 0 0-1.831-4.211 5.99 5.99 0 0 0-6.431-1.242 6.003 6.003 0 0 0-1.905 1.24l-1.731 1.721a.999.999 0 1 0 1.41 1.418l1.709-1.699a3.985 3.985 0 0 1 2.761-1.123 3.975 3.975 0 0 1 2.799 1.122 3.997 3.997 0 0 1 .111 5.644l-3.005 3.006a3.982 3.982 0 0 1-3.395 1.126 3.987 3.987 0 0 1-2.632-1.563A1 1 0 0 0 9.201 13.6zm5.602-3.198a5.99 5.99 0 0 0-3.949-2.345 5.987 5.987 0 0 0-5.105 1.702l-2.995 2.994a5.992 5.992 0 0 0-1.695 4.285 5.976 5.976 0 0 0 1.831 4.211 5.99 5.99 0 0 0 6.431 1.242 6.003 6.003 0 0 0 1.905-1.24l1.723-1.723a.999.999 0 1 0-1.414-1.414L9.836 19.81a3.985 3.985 0 0 1-2.761 1.123 3.975 3.975 0 0 1-2.799-1.122 3.997 3.997 0 0 1-.111-5.644l3.005-3.006a3.982 3.982 0 0 1 3.395-1.126 3.987 3.987 0 0 1 2.632 1.563 1 1 0 0 0 1.602-1.198z">
+     </path>
+    </svg>
+   </a>
+  </h2>
+  <p>
+   Markata's primary way of building your site for production.
+By default, running
+   <code>
+    markta build
+   </code>
+   will render your markdown to
+the
+   <code>
+    ./markout
+   </code>
+   directory.
+  </p>
+  <div class="highlight">
+   <pre><span></span><code>markata build
+</code></pre>
+  </div>
+  <p>
+   If you are having an issue and want to pop immediately into a debugger
+upon failure you can pass the
+   <code>
+    --pdb
+   </code>
+   flag to the build command.
+  </p>
+  <div class="highlight">
+   <pre><span></span><code>markata build  --pdb
+</code></pre>
+  </div>
+  <p>
+   If you do not like the way rich looks, or its suppressing tracebaks you
+would like to remain visible you can use
+   <code>
+    --no-pretty
+   </code>
+  </p>
+  <div class="highlight">
+   <pre><span></span><code>markata build --no-pretty
+</code></pre>
+  </div>
+  <p>
+   If you need to run without any console logging pass in the
+   <code>
+    --quiet
+   </code>
+   flag.
+  </p>
+  <div class="highlight">
+   <pre><span></span><code>markata build --quiet
+</code></pre>
+  </div>
+  <p>
+   <code>
+    markta build
+   </code>
+   will automatically run the pyinstrument profiler
+while building your site if you have pyinstrument installed.  It
+will echo out your profile in the console as well as write it to
+   <code>
+    /_profile
+   </code>
+   on your built site. If you prefer not to run
+pyinstrument profiling, even when it is installed you can pass
+in
+   <code>
+    --no-profile
+   </code>
+  </p>
+  <div class="highlight">
+   <pre><span></span><code>markata build --no-profile
+</code></pre>
+  </div>
+  <details>
+   <summary>
+    build source
+   </summary>
+   <div class="highlight">
+    <pre><span></span><code><span class="k">def</span> <span class="nf">build</span><span class="p">(</span>
+        <span class="n">pretty</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+            <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">"--quiet"</span><span class="p">,</span>
+            <span class="s2">"-q"</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="c1"># to_dict: bool = False,</span>
+        <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+            <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">"--verbose"</span><span class="p">,</span>
+            <span class="s2">"-v"</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">should_pdb</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+            <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">"--pdb"</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">profile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">"""</span>
+<span class="sd">        Markata's primary way of building your site for production.</span>
+<span class="sd">        By default, running `markta build` will render your markdown to</span>
+<span class="sd">        the `./markout` directory.</span>
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        markata build</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        If you are having an issue and want to pop immediately into a debugger</span>
+<span class="sd">        upon failure you can pass the `--pdb` flag to the build command.</span>
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        markata build  --pdb</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        If you do not like the way rich looks, or its suppressing tracebaks you</span>
+<span class="sd">        would like to remain visible you can use `--no-pretty`</span>
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        markata build --no-pretty</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        If you need to run without any console logging pass in the</span>
+<span class="sd">        `--quiet` flag.</span>
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        markata build --quiet</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        `markta build` will automatically run the pyinstrument profiler</span>
+<span class="sd">        while building your site if you have pyinstrument installed.  It</span>
+<span class="sd">        will echo out your profile in the console as well as write it to</span>
+<span class="sd">        `/_profile` on your built site. If you prefer not to run</span>
+<span class="sd">        pyinstrument profiling, even when it is installed you can pass</span>
+<span class="sd">        in `--no-profile`</span>
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        markata build --no-profile</span>
+<span class="sd">        ```</span>
+<span class="sd">        """</span>
+
+        <span class="k">if</span> <span class="n">pretty</span><span class="p">:</span>
+            <span class="n">make_pretty</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">quiet</span><span class="p">:</span>
+            <span class="n">markata</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">quiet</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">markata</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">"console options:"</span><span class="p">,</span> <span class="n">markata</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">options</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">profile</span><span class="p">:</span>
+            <span class="n">markata</span><span class="o">.</span><span class="n">should_profile_cli</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">markata</span><span class="o">.</span><span class="n">should_profile</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">markata</span><span class="o">.</span><span class="n">configure</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">should_pdb</span><span class="p">:</span>
+            <span class="n">pdb_run</span><span class="p">(</span><span class="n">markata</span><span class="o">.</span><span class="n">run</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">markata</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</code></pre>
+   </div>
+  </details>
+  <hr/>
+  <h2 id="list-function">
+   list
+   <code>
+    function
+   </code>
+   <a class="heading-permalink" href="#list-function">
+    <span class="visually-hidden">
+    </span>
+    <svg aria-hidden="true" fill="currentColor" focusable="false" height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg">
+     <path d="M9.199 13.599a5.99 5.99 0 0 0 3.949 2.345 5.987 5.987 0 0 0 5.105-1.702l2.995-2.994a5.992 5.992 0 0 0 1.695-4.285 5.976 5.976 0 0 0-1.831-4.211 5.99 5.99 0 0 0-6.431-1.242 6.003 6.003 0 0 0-1.905 1.24l-1.731 1.721a.999.999 0 1 0 1.41 1.418l1.709-1.699a3.985 3.985 0 0 1 2.761-1.123 3.975 3.975 0 0 1 2.799 1.122 3.997 3.997 0 0 1 .111 5.644l-3.005 3.006a3.982 3.982 0 0 1-3.395 1.126 3.987 3.987 0 0 1-2.632-1.563A1 1 0 0 0 9.201 13.6zm5.602-3.198a5.99 5.99 0 0 0-3.949-2.345 5.987 5.987 0 0 0-5.105 1.702l-2.995 2.994a5.992 5.992 0 0 0-1.695 4.285 5.976 5.976 0 0 0 1.831 4.211 5.99 5.99 0 0 0 6.431 1.242 6.003 6.003 0 0 0 1.905-1.24l1.723-1.723a.999.999 0 1 0-1.414-1.414L9.836 19.81a3.985 3.985 0 0 1-2.761 1.123 3.975 3.975 0 0 1-2.799-1.122 3.997 3.997 0 0 1-.111-5.644l3.005-3.006a3.982 3.982 0 0 1 3.395-1.126 3.987 3.987 0 0 1 2.632 1.563 1 1 0 0 0 1.602-1.198z">
+     </path>
+    </svg>
+   </a>
+  </h2>
+  <p>
+   Provides a way run markatas, map, filter, and sort from the
+command line.  I personally use this more often than the build
+command while I am writing on a site with a large number of
+posts on it.  It makes slicing in by
+   <code>
+    templatekey
+   </code>
+   ,
+   <code>
+    tag
+   </code>
+   , or
+   <code>
+    date
+   </code>
+   much easier.
+  </p>
+  <h3 id="default-list">
+   default list
+   <a class="heading-permalink" href="#default-list">
+    <span class="visually-hidden">
+    </span>
+    <svg aria-hidden="true" fill="currentColor" focusable="false" height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg">
+     <path d="M9.199 13.599a5.99 5.99 0 0 0 3.949 2.345 5.987 5.987 0 0 0 5.105-1.702l2.995-2.994a5.992 5.992 0 0 0 1.695-4.285 5.976 5.976 0 0 0-1.831-4.211 5.99 5.99 0 0 0-6.431-1.242 6.003 6.003 0 0 0-1.905 1.24l-1.731 1.721a.999.999 0 1 0 1.41 1.418l1.709-1.699a3.985 3.985 0 0 1 2.761-1.123 3.975 3.975 0 0 1 2.799 1.122 3.997 3.997 0 0 1 .111 5.644l-3.005 3.006a3.982 3.982 0 0 1-3.395 1.126 3.987 3.987 0 0 1-2.632-1.563A1 1 0 0 0 9.201 13.6zm5.602-3.198a5.99 5.99 0 0 0-3.949-2.345 5.987 5.987 0 0 0-5.105 1.702l-2.995 2.994a5.992 5.992 0 0 0-1.695 4.285 5.976 5.976 0 0 0 1.831 4.211 5.99 5.99 0 0 0 6.431 1.242 6.003 6.003 0 0 0 1.905-1.24l1.723-1.723a.999.999 0 1 0-1.414-1.414L9.836 19.81a3.985 3.985 0 0 1-2.761 1.123 3.975 3.975 0 0 1-2.799-1.122 3.997 3.997 0 0 1-.111-5.644l3.005-3.006a3.982 3.982 0 0 1 3.395-1.126 3.987 3.987 0 0 1 2.632 1.563 1 1 0 0 0 1.602-1.198z">
+     </path>
+    </svg>
+   </a>
+  </h3>
+  <p>
+   By default
+   <code>
+    markata list
+   </code>
+   will list all titles in a pager, for all posts
+being loaded by markata.
+  </p>
+  <div class="highlight">
+   <pre><span></span><code>markata list
+</code></pre>
+  </div>
+  <h3 id="skip-the-pager">
+   Skip the pager
+   <a class="heading-permalink" href="#skip-the-pager">
+    <span class="visually-hidden">
+    </span>
+    <svg aria-hidden="true" fill="currentColor" focusable="false" height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg">
+     <path d="M9.199 13.599a5.99 5.99 0 0 0 3.949 2.345 5.987 5.987 0 0 0 5.105-1.702l2.995-2.994a5.992 5.992 0 0 0 1.695-4.285 5.976 5.976 0 0 0-1.831-4.211 5.99 5.99 0 0 0-6.431-1.242 6.003 6.003 0 0 0-1.905 1.24l-1.731 1.721a.999.999 0 1 0 1.41 1.418l1.709-1.699a3.985 3.985 0 0 1 2.761-1.123 3.975 3.975 0 0 1 2.799 1.122 3.997 3.997 0 0 1 .111 5.644l-3.005 3.006a3.982 3.982 0 0 1-3.395 1.126 3.987 3.987 0 0 1-2.632-1.563A1 1 0 0 0 9.201 13.6zm5.602-3.198a5.99 5.99 0 0 0-3.949-2.345 5.987 5.987 0 0 0-5.105 1.702l-2.995 2.994a5.992 5.992 0 0 0-1.695 4.285 5.976 5.976 0 0 0 1.831 4.211 5.99 5.99 0 0 0 6.431 1.242 6.003 6.003 0 0 0 1.905-1.24l1.723-1.723a.999.999 0 1 0-1.414-1.414L9.836 19.81a3.985 3.985 0 0 1-2.761 1.123 3.975 3.975 0 0 1-2.799-1.122 3.997 3.997 0 0 1-.111-5.644l3.005-3.006a3.982 3.982 0 0 1 3.395-1.126 3.987 3.987 0 0 1 2.632 1.563 1 1 0 0 0 1.602-1.198z">
+     </path>
+    </svg>
+   </a>
+  </h3>
+  <p>
+   Markata uses rich for its pager, it's pretty smart about when to
+use the pager or pass text to the next thing in the pipeline,
+but if you don't want to run a pager you can pass
+   <code>
+    --no-pager
+   </code>
+  </p>
+  <div class="highlight">
+   <pre><span></span><code>markata list --no-pager
+</code></pre>
+  </div>
+  <h3 id="list-other-attributes">
+   List other attributes
+   <a class="heading-permalink" href="#list-other-attributes">
+    <span class="visually-hidden">
+    </span>
+    <svg aria-hidden="true" fill="currentColor" focusable="false" height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg">
+     <path d="M9.199 13.599a5.99 5.99 0 0 0 3.949 2.345 5.987 5.987 0 0 0 5.105-1.702l2.995-2.994a5.992 5.992 0 0 0 1.695-4.285 5.976 5.976 0 0 0-1.831-4.211 5.99 5.99 0 0 0-6.431-1.242 6.003 6.003 0 0 0-1.905 1.24l-1.731 1.721a.999.999 0 1 0 1.41 1.418l1.709-1.699a3.985 3.985 0 0 1 2.761-1.123 3.975 3.975 0 0 1 2.799 1.122 3.997 3.997 0 0 1 .111 5.644l-3.005 3.006a3.982 3.982 0 0 1-3.395 1.126 3.987 3.987 0 0 1-2.632-1.563A1 1 0 0 0 9.201 13.6zm5.602-3.198a5.99 5.99 0 0 0-3.949-2.345 5.987 5.987 0 0 0-5.105 1.702l-2.995 2.994a5.992 5.992 0 0 0-1.695 4.285 5.976 5.976 0 0 0 1.831 4.211 5.99 5.99 0 0 0 6.431 1.242 6.003 6.003 0 0 0 1.905-1.24l1.723-1.723a.999.999 0 1 0-1.414-1.414L9.836 19.81a3.985 3.985 0 0 1-2.761 1.123 3.975 3.975 0 0 1-2.799-1.122 3.997 3.997 0 0 1-.111-5.644l3.005-3.006a3.982 3.982 0 0 1 3.395-1.126 3.987 3.987 0 0 1 2.632 1.563 1 1 0 0 0 1.602-1.198z">
+     </path>
+    </svg>
+   </a>
+  </h3>
+  <p>
+   You can list any other attribute tied to your posts.  These are
+added through either your yaml frontmatter at the start of your
+post, or through the use of a plugin.
+  </p>
+  <div class="highlight">
+   <pre><span></span><code><span class="c1"># the filepath of the post</span>
+markata list --map path
+
+<span class="c1"># the slug of the post (where it will show up on the site)</span>
+markata list --map slug
+
+<span class="c1"># the date of the post</span>
+markata list --map date
+
+<span class="c1"># the full raw content of the post</span>
+markata list --map content
+</code></pre>
+  </div>
+  <h3 id="list-more-than-one-attribute">
+   List more than one attribute
+   <a class="heading-permalink" href="#list-more-than-one-attribute">
+    <span class="visually-hidden">
+    </span>
+    <svg aria-hidden="true" fill="currentColor" focusable="false" height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg">
+     <path d="M9.199 13.599a5.99 5.99 0 0 0 3.949 2.345 5.987 5.987 0 0 0 5.105-1.702l2.995-2.994a5.992 5.992 0 0 0 1.695-4.285 5.976 5.976 0 0 0-1.831-4.211 5.99 5.99 0 0 0-6.431-1.242 6.003 6.003 0 0 0-1.905 1.24l-1.731 1.721a.999.999 0 1 0 1.41 1.418l1.709-1.699a3.985 3.985 0 0 1 2.761-1.123 3.975 3.975 0 0 1 2.799 1.122 3.997 3.997 0 0 1 .111 5.644l-3.005 3.006a3.982 3.982 0 0 1-3.395 1.126 3.987 3.987 0 0 1-2.632-1.563A1 1 0 0 0 9.201 13.6zm5.602-3.198a5.99 5.99 0 0 0-3.949-2.345 5.987 5.987 0 0 0-5.105 1.702l-2.995 2.994a5.992 5.992 0 0 0-1.695 4.285 5.976 5.976 0 0 0 1.831 4.211 5.99 5.99 0 0 0 6.431 1.242 6.003 6.003 0 0 0 1.905-1.24l1.723-1.723a.999.999 0 1 0-1.414-1.414L9.836 19.81a3.985 3.985 0 0 1-2.761 1.123 3.975 3.975 0 0 1-2.799-1.122 3.997 3.997 0 0 1-.111-5.644l3.005-3.006a3.982 3.982 0 0 1 3.395-1.126 3.987 3.987 0 0 1 2.632 1.563 1 1 0 0 0 1.602-1.198z">
+     </path>
+    </svg>
+   </a>
+  </h3>
+  <p>
+   You can create new attributes as you map to echo out by
+combining existing attributes.
+  </p>
+  <div class="highlight">
+   <pre><span></span><code>markata list --map <span class="s1">'title + " , " + slug'</span>
+</code></pre>
+  </div>
+  <h3 id="using-python-objects-as-map">
+   Using Python objects as map
+   <a class="heading-permalink" href="#using-python-objects-as-map">
+    <span class="visually-hidden">
+    </span>
+    <svg aria-hidden="true" fill="currentColor" focusable="false" height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg">
+     <path d="M9.199 13.599a5.99 5.99 0 0 0 3.949 2.345 5.987 5.987 0 0 0 5.105-1.702l2.995-2.994a5.992 5.992 0 0 0 1.695-4.285 5.976 5.976 0 0 0-1.831-4.211 5.99 5.99 0 0 0-6.431-1.242 6.003 6.003 0 0 0-1.905 1.24l-1.731 1.721a.999.999 0 1 0 1.41 1.418l1.709-1.699a3.985 3.985 0 0 1 2.761-1.123 3.975 3.975 0 0 1 2.799 1.122 3.997 3.997 0 0 1 .111 5.644l-3.005 3.006a3.982 3.982 0 0 1-3.395 1.126 3.987 3.987 0 0 1-2.632-1.563A1 1 0 0 0 9.201 13.6zm5.602-3.198a5.99 5.99 0 0 0-3.949-2.345 5.987 5.987 0 0 0-5.105 1.702l-2.995 2.994a5.992 5.992 0 0 0-1.695 4.285 5.976 5.976 0 0 0 1.831 4.211 5.99 5.99 0 0 0 6.431 1.242 6.003 6.003 0 0 0 1.905-1.24l1.723-1.723a.999.999 0 1 0-1.414-1.414L9.836 19.81a3.985 3.985 0 0 1-2.761 1.123 3.975 3.975 0 0 1-2.799-1.122 3.997 3.997 0 0 1-.111-5.644l3.005-3.006a3.982 3.982 0 0 1 3.395-1.126 3.987 3.987 0 0 1 2.632 1.563 1 1 0 0 0 1.602-1.198z">
+     </path>
+    </svg>
+   </a>
+  </h3>
+  <p>
+   You can access attributes of each post attribute that you map
+over.  For instance on my blog, each post has a date that is a
+datetime object.  I can ask each post for its
+   <code>
+    date.year
+   </code>
+  </p>
+  <div class="highlight">
+   <pre><span></span><code>markata list --map date.year
+
+<span class="c1"># combining this with title</span>
+markata list --map <span class="s1">'str(date.year) + "," + title'</span>
+</code></pre>
+  </div>
+  <h3 id="filtering-posts">
+   Filtering posts
+   <a class="heading-permalink" href="#filtering-posts">
+    <span class="visually-hidden">
+    </span>
+    <svg aria-hidden="true" fill="currentColor" focusable="false" height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg">
+     <path d="M9.199 13.599a5.99 5.99 0 0 0 3.949 2.345 5.987 5.987 0 0 0 5.105-1.702l2.995-2.994a5.992 5.992 0 0 0 1.695-4.285 5.976 5.976 0 0 0-1.831-4.211 5.99 5.99 0 0 0-6.431-1.242 6.003 6.003 0 0 0-1.905 1.24l-1.731 1.721a.999.999 0 1 0 1.41 1.418l1.709-1.699a3.985 3.985 0 0 1 2.761-1.123 3.975 3.975 0 0 1 2.799 1.122 3.997 3.997 0 0 1 .111 5.644l-3.005 3.006a3.982 3.982 0 0 1-3.395 1.126 3.987 3.987 0 0 1-2.632-1.563A1 1 0 0 0 9.201 13.6zm5.602-3.198a5.99 5.99 0 0 0-3.949-2.345 5.987 5.987 0 0 0-5.105 1.702l-2.995 2.994a5.992 5.992 0 0 0-1.695 4.285 5.976 5.976 0 0 0 1.831 4.211 5.99 5.99 0 0 0 6.431 1.242 6.003 6.003 0 0 0 1.905-1.24l1.723-1.723a.999.999 0 1 0-1.414-1.414L9.836 19.81a3.985 3.985 0 0 1-2.761 1.123 3.975 3.975 0 0 1-2.799-1.122 3.997 3.997 0 0 1-.111-5.644l3.005-3.006a3.982 3.982 0 0 1 3.395-1.126 3.987 3.987 0 0 1 2.632 1.563 1 1 0 0 0 1.602-1.198z">
+     </path>
+    </svg>
+   </a>
+  </h3>
+  <p>
+   Posts are filtered with python syntax, you will have all
+attributes tied to your posts available to filter with.
+  </p>
+  <div class="highlight">
+   <pre><span></span><code>markata list --filter <span class="s2">"'__' not in title"</span>
+</code></pre>
+  </div>
+  <h3 id="filtering-by-dates">
+   Filtering by dates
+   <a class="heading-permalink" href="#filtering-by-dates">
+    <span class="visually-hidden">
+    </span>
+    <svg aria-hidden="true" fill="currentColor" focusable="false" height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg">
+     <path d="M9.199 13.599a5.99 5.99 0 0 0 3.949 2.345 5.987 5.987 0 0 0 5.105-1.702l2.995-2.994a5.992 5.992 0 0 0 1.695-4.285 5.976 5.976 0 0 0-1.831-4.211 5.99 5.99 0 0 0-6.431-1.242 6.003 6.003 0 0 0-1.905 1.24l-1.731 1.721a.999.999 0 1 0 1.41 1.418l1.709-1.699a3.985 3.985 0 0 1 2.761-1.123 3.975 3.975 0 0 1 2.799 1.122 3.997 3.997 0 0 1 .111 5.644l-3.005 3.006a3.982 3.982 0 0 1-3.395 1.126 3.987 3.987 0 0 1-2.632-1.563A1 1 0 0 0 9.201 13.6zm5.602-3.198a5.99 5.99 0 0 0-3.949-2.345 5.987 5.987 0 0 0-5.105 1.702l-2.995 2.994a5.992 5.992 0 0 0-1.695 4.285 5.976 5.976 0 0 0 1.831 4.211 5.99 5.99 0 0 0 6.431 1.242 6.003 6.003 0 0 0 1.905-1.24l1.723-1.723a.999.999 0 1 0-1.414-1.414L9.836 19.81a3.985 3.985 0 0 1-2.761 1.123 3.975 3.975 0 0 1-2.799-1.122 3.997 3.997 0 0 1-.111-5.644l3.005-3.006a3.982 3.982 0 0 1 3.395-1.126 3.987 3.987 0 0 1 2.632 1.563 1 1 0 0 0 1.602-1.198z">
+     </path>
+    </svg>
+   </a>
+  </h3>
+  <p>
+   If your site has dates tied to your posts you can filter by
+date.  On my blog this makes a ton of sense and is quite useful.
+On the Markata docs though it doesn't really make much sense,
+since there really isn't the idea of a post date there.
+  </p>
+  <div class="highlight">
+   <pre><span></span><code><span class="c1"># listing today's posts</span>
+markata list --filter <span class="s2">"date==today"</span>
+
+<span class="c1"># listing this year's posts</span>
+markata list --filter <span class="s2">"date.year==today.year"</span>
+</code></pre>
+  </div>
+  <h3 id="full-content-search">
+   Full Content Search
+   <a class="heading-permalink" href="#full-content-search">
+    <span class="visually-hidden">
+    </span>
+    <svg aria-hidden="true" fill="currentColor" focusable="false" height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg">
+     <path d="M9.199 13.599a5.99 5.99 0 0 0 3.949 2.345 5.987 5.987 0 0 0 5.105-1.702l2.995-2.994a5.992 5.992 0 0 0 1.695-4.285 5.976 5.976 0 0 0-1.831-4.211 5.99 5.99 0 0 0-6.431-1.242 6.003 6.003 0 0 0-1.905 1.24l-1.731 1.721a.999.999 0 1 0 1.41 1.418l1.709-1.699a3.985 3.985 0 0 1 2.761-1.123 3.975 3.975 0 0 1 2.799 1.122 3.997 3.997 0 0 1 .111 5.644l-3.005 3.006a3.982 3.982 0 0 1-3.395 1.126 3.987 3.987 0 0 1-2.632-1.563A1 1 0 0 0 9.201 13.6zm5.602-3.198a5.99 5.99 0 0 0-3.949-2.345 5.987 5.987 0 0 0-5.105 1.702l-2.995 2.994a5.992 5.992 0 0 0-1.695 4.285 5.976 5.976 0 0 0 1.831 4.211 5.99 5.99 0 0 0 6.431 1.242 6.003 6.003 0 0 0 1.905-1.24l1.723-1.723a.999.999 0 1 0-1.414-1.414L9.836 19.81a3.985 3.985 0 0 1-2.761 1.123 3.975 3.975 0 0 1-2.799-1.122 3.997 3.997 0 0 1-.111-5.644l3.005-3.006a3.982 3.982 0 0 1 3.395-1.126 3.987 3.987 0 0 1 2.632 1.563 1 1 0 0 0 1.602-1.198z">
+     </path>
+    </svg>
+   </a>
+  </h3>
+  <p>
+   You can also search the full content of each post for specific
+words.
+  </p>
+  <div class="highlight">
+   <pre><span></span><code>markata list --filter <span class="s2">"'python' in content"</span>
+</code></pre>
+  </div>
+  <h3 id="filtering-by-frontmatter-data">
+   Filtering by frontmatter data
+   <a class="heading-permalink" href="#filtering-by-frontmatter-data">
+    <span class="visually-hidden">
+    </span>
+    <svg aria-hidden="true" fill="currentColor" focusable="false" height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg">
+     <path d="M9.199 13.599a5.99 5.99 0 0 0 3.949 2.345 5.987 5.987 0 0 0 5.105-1.702l2.995-2.994a5.992 5.992 0 0 0 1.695-4.285 5.976 5.976 0 0 0-1.831-4.211 5.99 5.99 0 0 0-6.431-1.242 6.003 6.003 0 0 0-1.905 1.24l-1.731 1.721a.999.999 0 1 0 1.41 1.418l1.709-1.699a3.985 3.985 0 0 1 2.761-1.123 3.975 3.975 0 0 1 2.799 1.122 3.997 3.997 0 0 1 .111 5.644l-3.005 3.006a3.982 3.982 0 0 1-3.395 1.126 3.987 3.987 0 0 1-2.632-1.563A1 1 0 0 0 9.201 13.6zm5.602-3.198a5.99 5.99 0 0 0-3.949-2.345 5.987 5.987 0 0 0-5.105 1.702l-2.995 2.994a5.992 5.992 0 0 0-1.695 4.285 5.976 5.976 0 0 0 1.831 4.211 5.99 5.99 0 0 0 6.431 1.242 6.003 6.003 0 0 0 1.905-1.24l1.723-1.723a.999.999 0 1 0-1.414-1.414L9.836 19.81a3.985 3.985 0 0 1-2.761 1.123 3.975 3.975 0 0 1-2.799-1.122 3.997 3.997 0 0 1-.111-5.644l3.005-3.006a3.982 3.982 0 0 1 3.395-1.126 3.987 3.987 0 0 1 2.632 1.563 1 1 0 0 0 1.602-1.198z">
+     </path>
+    </svg>
+   </a>
+  </h3>
+  <p>
+   I use a templateKey on my personal blog to determine which
+template to render the page with.  I can fitler my posts by a
+   <code>
+    til
+   </code>
+   (today i learned) key.
+  </p>
+  <div class="highlight">
+   <pre><span></span><code>markata list --filter <span class="s2">"templateKey=='til'"</span>
+</code></pre>
+  </div>
+  <h3 id="combining-filters">
+   Combining filters
+   <a class="heading-permalink" href="#combining-filters">
+    <span class="visually-hidden">
+    </span>
+    <svg aria-hidden="true" fill="currentColor" focusable="false" height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg">
+     <path d="M9.199 13.599a5.99 5.99 0 0 0 3.949 2.345 5.987 5.987 0 0 0 5.105-1.702l2.995-2.994a5.992 5.992 0 0 0 1.695-4.285 5.976 5.976 0 0 0-1.831-4.211 5.99 5.99 0 0 0-6.431-1.242 6.003 6.003 0 0 0-1.905 1.24l-1.731 1.721a.999.999 0 1 0 1.41 1.418l1.709-1.699a3.985 3.985 0 0 1 2.761-1.123 3.975 3.975 0 0 1 2.799 1.122 3.997 3.997 0 0 1 .111 5.644l-3.005 3.006a3.982 3.982 0 0 1-3.395 1.126 3.987 3.987 0 0 1-2.632-1.563A1 1 0 0 0 9.201 13.6zm5.602-3.198a5.99 5.99 0 0 0-3.949-2.345 5.987 5.987 0 0 0-5.105 1.702l-2.995 2.994a5.992 5.992 0 0 0-1.695 4.285 5.976 5.976 0 0 0 1.831 4.211 5.99 5.99 0 0 0 6.431 1.242 6.003 6.003 0 0 0 1.905-1.24l1.723-1.723a.999.999 0 1 0-1.414-1.414L9.836 19.81a3.985 3.985 0 0 1-2.761 1.123 3.975 3.975 0 0 1-2.799-1.122 3.997 3.997 0 0 1-.111-5.644l3.005-3.006a3.982 3.982 0 0 1 3.395-1.126 3.987 3.987 0 0 1 2.632 1.563 1 1 0 0 0 1.602-1.198z">
+     </path>
+    </svg>
+   </a>
+  </h3>
+  <p>
+   Filters can be combined together quite like maps can, it's all
+just python syntax.
+  </p>
+  <div class="highlight">
+   <pre><span></span><code>markata list --filter <span class="s2">"templateKey=='til' and date == today"</span>
+</code></pre>
+  </div>
+  <h3 id="sorting-posts">
+   Sorting posts
+   <a class="heading-permalink" href="#sorting-posts">
+    <span class="visually-hidden">
+    </span>
+    <svg aria-hidden="true" fill="currentColor" focusable="false" height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg">
+     <path d="M9.199 13.599a5.99 5.99 0 0 0 3.949 2.345 5.987 5.987 0 0 0 5.105-1.702l2.995-2.994a5.992 5.992 0 0 0 1.695-4.285 5.976 5.976 0 0 0-1.831-4.211 5.99 5.99 0 0 0-6.431-1.242 6.003 6.003 0 0 0-1.905 1.24l-1.731 1.721a.999.999 0 1 0 1.41 1.418l1.709-1.699a3.985 3.985 0 0 1 2.761-1.123 3.975 3.975 0 0 1 2.799 1.122 3.997 3.997 0 0 1 .111 5.644l-3.005 3.006a3.982 3.982 0 0 1-3.395 1.126 3.987 3.987 0 0 1-2.632-1.563A1 1 0 0 0 9.201 13.6zm5.602-3.198a5.99 5.99 0 0 0-3.949-2.345 5.987 5.987 0 0 0-5.105 1.702l-2.995 2.994a5.992 5.992 0 0 0-1.695 4.285 5.976 5.976 0 0 0 1.831 4.211 5.99 5.99 0 0 0 6.431 1.242 6.003 6.003 0 0 0 1.905-1.24l1.723-1.723a.999.999 0 1 0-1.414-1.414L9.836 19.81a3.985 3.985 0 0 1-2.761 1.123 3.975 3.975 0 0 1-2.799-1.122 3.997 3.997 0 0 1-.111-5.644l3.005-3.006a3.982 3.982 0 0 1 3.395-1.126 3.987 3.987 0 0 1 2.632 1.563 1 1 0 0 0 1.602-1.198z">
+     </path>
+    </svg>
+   </a>
+  </h3>
+  <p>
+   Posts can be sorted by attributes on your post, and they can
+even be reversed.
+  </p>
+  <div class="highlight">
+   <pre><span></span><code>markta list --sort date
+markta list --sort date --reverse
+</code></pre>
+  </div>
+  <h3 id="putting-it-all-together">
+   Putting it all together
+   <a class="heading-permalink" href="#putting-it-all-together">
+    <span class="visually-hidden">
+    </span>
+    <svg aria-hidden="true" fill="currentColor" focusable="false" height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg">
+     <path d="M9.199 13.599a5.99 5.99 0 0 0 3.949 2.345 5.987 5.987 0 0 0 5.105-1.702l2.995-2.994a5.992 5.992 0 0 0 1.695-4.285 5.976 5.976 0 0 0-1.831-4.211 5.99 5.99 0 0 0-6.431-1.242 6.003 6.003 0 0 0-1.905 1.24l-1.731 1.721a.999.999 0 1 0 1.41 1.418l1.709-1.699a3.985 3.985 0 0 1 2.761-1.123 3.975 3.975 0 0 1 2.799 1.122 3.997 3.997 0 0 1 .111 5.644l-3.005 3.006a3.982 3.982 0 0 1-3.395 1.126 3.987 3.987 0 0 1-2.632-1.563A1 1 0 0 0 9.201 13.6zm5.602-3.198a5.99 5.99 0 0 0-3.949-2.345 5.987 5.987 0 0 0-5.105 1.702l-2.995 2.994a5.992 5.992 0 0 0-1.695 4.285 5.976 5.976 0 0 0 1.831 4.211 5.99 5.99 0 0 0 6.431 1.242 6.003 6.003 0 0 0 1.905-1.24l1.723-1.723a.999.999 0 1 0-1.414-1.414L9.836 19.81a3.985 3.985 0 0 1-2.761 1.123 3.975 3.975 0 0 1-2.799-1.122 3.997 3.997 0 0 1-.111-5.644l3.005-3.006a3.982 3.982 0 0 1 3.395-1.126 3.987 3.987 0 0 1 2.632 1.563 1 1 0 0 0 1.602-1.198z">
+     </path>
+    </svg>
+   </a>
+  </h3>
+  <p>
+   The real power of all this comes when you combine them all into
+lists that work for you and your workflow.  This really makes
+working on larger projects so much easier to find things.
+  </p>
+  <h3 id="making-a-fuzzy-picker-for-your-posts">
+   Making a fuzzy picker for your posts
+   <a class="heading-permalink" href="#making-a-fuzzy-picker-for-your-posts">
+    <span class="visually-hidden">
+    </span>
+    <svg aria-hidden="true" fill="currentColor" focusable="false" height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg">
+     <path d="M9.199 13.599a5.99 5.99 0 0 0 3.949 2.345 5.987 5.987 0 0 0 5.105-1.702l2.995-2.994a5.992 5.992 0 0 0 1.695-4.285 5.976 5.976 0 0 0-1.831-4.211 5.99 5.99 0 0 0-6.431-1.242 6.003 6.003 0 0 0-1.905 1.24l-1.731 1.721a.999.999 0 1 0 1.41 1.418l1.709-1.699a3.985 3.985 0 0 1 2.761-1.123 3.975 3.975 0 0 1 2.799 1.122 3.997 3.997 0 0 1 .111 5.644l-3.005 3.006a3.982 3.982 0 0 1-3.395 1.126 3.987 3.987 0 0 1-2.632-1.563A1 1 0 0 0 9.201 13.6zm5.602-3.198a5.99 5.99 0 0 0-3.949-2.345 5.987 5.987 0 0 0-5.105 1.702l-2.995 2.994a5.992 5.992 0 0 0-1.695 4.285 5.976 5.976 0 0 0 1.831 4.211 5.99 5.99 0 0 0 6.431 1.242 6.003 6.003 0 0 0 1.905-1.24l1.723-1.723a.999.999 0 1 0-1.414-1.414L9.836 19.81a3.985 3.985 0 0 1-2.761 1.123 3.975 3.975 0 0 1-2.799-1.122 3.997 3.997 0 0 1-.111-5.644l3.005-3.006a3.982 3.982 0 0 1 3.395-1.126 3.987 3.987 0 0 1 2.632 1.563 1 1 0 0 0 1.602-1.198z">
+     </path>
+    </svg>
+   </a>
+  </h3>
+  <p>
+   Here is a bash command to open an fzf picker for todays posts,
+then open it in your
+   <code>
+    $EDITOR
+   </code>
+  </p>
+  <div class="highlight">
+   <pre><span></span><code>markata list --map path --filter <span class="s1">'date==today'</span> --sort date --reverse <span class="p">|</span> fzf --preview <span class="s1">'bat --color always {}'</span> <span class="p">|</span> xargs -I <span class="o">{}</span> <span class="nv">$EDITOR</span> <span class="o">{}</span>
+</code></pre>
+  </div>
+  <h3 id="combining-wtih-nvim-telescope">
+   Combining wtih nvim Telescope
+   <a class="heading-permalink" href="#combining-wtih-nvim-telescope">
+    <span class="visually-hidden">
+    </span>
+    <svg aria-hidden="true" fill="currentColor" focusable="false" height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg">
+     <path d="M9.199 13.599a5.99 5.99 0 0 0 3.949 2.345 5.987 5.987 0 0 0 5.105-1.702l2.995-2.994a5.992 5.992 0 0 0 1.695-4.285 5.976 5.976 0 0 0-1.831-4.211 5.99 5.99 0 0 0-6.431-1.242 6.003 6.003 0 0 0-1.905 1.24l-1.731 1.721a.999.999 0 1 0 1.41 1.418l1.709-1.699a3.985 3.985 0 0 1 2.761-1.123 3.975 3.975 0 0 1 2.799 1.122 3.997 3.997 0 0 1 .111 5.644l-3.005 3.006a3.982 3.982 0 0 1-3.395 1.126 3.987 3.987 0 0 1-2.632-1.563A1 1 0 0 0 9.201 13.6zm5.602-3.198a5.99 5.99 0 0 0-3.949-2.345 5.987 5.987 0 0 0-5.105 1.702l-2.995 2.994a5.992 5.992 0 0 0-1.695 4.285 5.976 5.976 0 0 0 1.831 4.211 5.99 5.99 0 0 0 6.431 1.242 6.003 6.003 0 0 0 1.905-1.24l1.723-1.723a.999.999 0 1 0-1.414-1.414L9.836 19.81a3.985 3.985 0 0 1-2.761 1.123 3.975 3.975 0 0 1-2.799-1.122 3.997 3.997 0 0 1-.111-5.644l3.005-3.006a3.982 3.982 0 0 1 3.395-1.126 3.987 3.987 0 0 1 2.632 1.563 1 1 0 0 0 1.602-1.198z">
+     </path>
+    </svg>
+   </a>
+  </h3>
+  <p>
+   Here is the same command setup as a Telescope picker for neovim.
+  </p>
+  <div class="highlight">
+   <pre><span></span><code><span class="nb">nnoremap</span> <span class="p">&lt;</span>leader<span class="p">&gt;</span><span class="nb">et</span> <span class="p">&lt;</span>cmd<span class="p">&gt;</span>Telescope find_files find_command<span class="p">=</span>markata<span class="p">,</span><span class="nb">list</span><span class="p">,--</span>map<span class="p">,</span><span class="nb">path</span><span class="p">,--</span>filter<span class="p">,</span>date<span class="p">==</span>today<span class="p">&lt;</span><span class="k">cr</span><span class="p">&gt;</span>
+</code></pre>
+  </div>
+  <p>
+   If you have another way to open posts in your editor with
+   <code>
+    markata list
+   </code>
+   I would love to accept a PR to add it to the
+examples here.
+  </p>
+  <details>
+   <summary>
+    list source
+   </summary>
+   <div class="highlight">
+    <pre><span></span><code><span class="k">def</span> <span class="nf">list</span><span class="p">(</span>
+        <span class="nb">map</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"title"</span><span class="p">,</span>
+        <span class="nb">filter</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"True"</span><span class="p">,</span>
+        <span class="n">sort</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"True"</span><span class="p">,</span>
+        <span class="n">head</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">tail</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">include_empty</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">reverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">use_pager</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s2">"--pager"</span><span class="p">,</span> <span class="s2">"--no-pager"</span><span class="p">),</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">"""</span>
+<span class="sd">        Provides a way run markatas, map, filter, and sort from the</span>
+<span class="sd">        command line.  I personally use this more often than the build</span>
+<span class="sd">        command while I am writing on a site with a large number of</span>
+<span class="sd">        posts on it.  It makes slicing in by `templatekey`, `tag`, or</span>
+<span class="sd">        `date` much easier.</span>
+
+<span class="sd">        ### default list</span>
+
+<span class="sd">        By default `markata list` will list all titles in a pager, for all posts</span>
+<span class="sd">        being loaded by markata.</span>
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        markata list</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        ### Skip the pager</span>
+
+<span class="sd">        Markata uses rich for its pager, it's pretty smart about when to</span>
+<span class="sd">        use the pager or pass text to the next thing in the pipeline,</span>
+<span class="sd">        but if you don't want to run a pager you can pass  `--no-pager`</span>
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        markata list --no-pager</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        ### List other attributes</span>
+
+<span class="sd">        You can list any other attribute tied to your posts.  These are</span>
+<span class="sd">        added through either your yaml frontmatter at the start of your</span>
+<span class="sd">        post, or through the use of a plugin.</span>
+
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        # the filepath of the post</span>
+<span class="sd">        markata list --map path</span>
+
+<span class="sd">        # the slug of the post (where it will show up on the site)</span>
+<span class="sd">        markata list --map slug</span>
+
+<span class="sd">        # the date of the post</span>
+<span class="sd">        markata list --map date</span>
+
+<span class="sd">        # the full raw content of the post</span>
+<span class="sd">        markata list --map content</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        ### List more than one attribute</span>
+
+<span class="sd">        You can create new attributes as you map to echo out by</span>
+<span class="sd">        combining existing attributes.</span>
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        markata list --map 'title + " , " + slug'</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        ### Using Python objects as map</span>
+
+<span class="sd">        You can access attributes of each post attribute that you map</span>
+<span class="sd">        over.  For instance on my blog, each post has a date that is a</span>
+<span class="sd">        datetime object.  I can ask each post for its `date.year`</span>
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        markata list --map date.year</span>
+
+<span class="sd">        # combining this with title</span>
+<span class="sd">        markata list --map 'str(date.year) + "," + title'</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        ### Filtering posts</span>
+
+<span class="sd">        Posts are filtered with python syntax, you will have all</span>
+<span class="sd">        attributes tied to your posts available to filter with.</span>
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        markata list --filter "'__' not in title"</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        ### Filtering by dates</span>
+
+<span class="sd">        If your site has dates tied to your posts you can filter by</span>
+<span class="sd">        date.  On my blog this makes a ton of sense and is quite useful.</span>
+<span class="sd">        On the Markata docs though it doesn't really make much sense,</span>
+<span class="sd">        since there really isn't the idea of a post date there.</span>
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        # listing today's posts</span>
+<span class="sd">        markata list --filter "date==today"</span>
+
+<span class="sd">        # listing this year's posts</span>
+<span class="sd">        markata list --filter "date.year==today.year"</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        ### Full Content Search</span>
+
+<span class="sd">        You can also search the full content of each post for specific</span>
+<span class="sd">        words.</span>
+<span class="sd">        ``` bash</span>
+
+<span class="sd">        markata list --filter "'python' in content"</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        ### Filtering by frontmatter data</span>
+
+<span class="sd">        I use a templateKey on my personal blog to determine which</span>
+<span class="sd">        template to render the page with.  I can fitler my posts by a</span>
+<span class="sd">        `til` (today i learned) key.</span>
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        markata list --filter "templateKey=='til'"</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        ### Combining filters</span>
+
+<span class="sd">        Filters can be combined together quite like maps can, it's all</span>
+<span class="sd">        just python syntax.</span>
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        markata list --filter "templateKey=='til' and date == today"</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        ### Sorting posts</span>
+
+<span class="sd">        Posts can be sorted by attributes on your post, and they can</span>
+<span class="sd">        even be reversed.</span>
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        markta list --sort date</span>
+<span class="sd">        markta list --sort date --reverse</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        ### Putting it all together</span>
+
+<span class="sd">        The real power of all this comes when you combine them all into</span>
+<span class="sd">        lists that work for you and your workflow.  This really makes</span>
+<span class="sd">        working on larger projects so much easier to find things.</span>
+
+
+<span class="sd">        ### Making a fuzzy picker for your posts</span>
+
+<span class="sd">        Here is a bash command to open an fzf picker for todays posts,</span>
+<span class="sd">        then open it in your `$EDITOR`</span>
+
+<span class="sd">        ``` bash</span>
+<span class="sd">        markata list --map path --filter 'date==today' --sort date --reverse | fzf --preview 'bat --color always {}' | xargs -I {} $EDITOR {}</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        ### Combining wtih nvim Telescope</span>
+
+<span class="sd">        Here is the same command setup as a Telescope picker for neovim.</span>
+
+<span class="sd">        ``` vim</span>
+<span class="sd">        nnoremap &lt;leader&gt;et &lt;cmd&gt;Telescope find_files find_command=markata,list,--map,path,--filter,date==today&lt;cr&gt;</span>
+<span class="sd">        ```</span>
+
+<span class="sd">        If you have another way to open posts in your editor with</span>
+<span class="sd">        `markata list` I would love to accept a PR to add it to the</span>
+<span class="sd">        examples here.</span>
+<span class="sd">        """</span>
+
+        <span class="n">markata</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">quiet</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="n">tail</span> <span class="o">=</span> <span class="o">-</span><span class="n">tail</span> <span class="k">if</span> <span class="n">tail</span> <span class="k">else</span> <span class="n">tail</span>
+        <span class="n">filtered</span> <span class="o">=</span> <span class="n">markata</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">map</span><span class="p">,</span> <span class="nb">filter</span><span class="p">,</span> <span class="n">sort</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">include_empty</span><span class="p">:</span>
+            <span class="n">filtered</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">filtered</span> <span class="k">if</span> <span class="n">a</span> <span class="o">!=</span> <span class="s2">""</span><span class="p">]</span>
+        <span class="n">filtered</span> <span class="o">=</span> <span class="n">filtered</span><span class="p">[</span><span class="n">tail</span><span class="p">:</span><span class="n">head</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">reverse</span><span class="p">:</span>
+            <span class="n">filtered</span> <span class="o">=</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">filtered</span><span class="p">)</span>
+
+        <span class="n">markata</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">quiet</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">markata</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">is_terminal</span> <span class="ow">and</span> <span class="n">use_pager</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">markata</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">pager</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">filtered</span><span class="p">:</span>
+                    <span class="n">markata</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">"purple"</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">filtered</span><span class="p">:</span>
+                <span class="n">markata</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+</code></pre>
+   </div>
+  </details>
+  <footer>
+   © 2022
+  </footer>
+ </body>
+</html>
